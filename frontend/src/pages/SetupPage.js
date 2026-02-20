@@ -233,11 +233,11 @@ export default function SetupPage() {
             <div className="flex items-center gap-3 mb-2">
               <OpenClaw size={36} />
               <h1 className="heading text-2xl sm:text-3xl font-semibold tracking-tight">
-                OpenClaw Setup
+                MoltBot Setup
               </h1>
             </div>
             <p className="text-zinc-400 text-sm sm:text-base">
-              Connect your LLM provider to start the OpenClaw Control UI.
+              Connect your LLM provider to start the MoltBot Control UI.
             </p>
           </div>
           
@@ -285,10 +285,10 @@ export default function SetupPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 text-yellow-500 mb-4">
                   <AlertCircle className="w-5 h-5" />
-                  <span className="font-medium">OpenClaw in use</span>
+                  <span className="font-medium">MoltBot in use</span>
                 </div>
                 <p className="text-zinc-400 text-sm">
-                  Another user is currently using OpenClaw. Please wait for them to stop their session.
+                  Another user is currently using MoltBot. Please wait for them to stop their session.
                 </p>
               </CardContent>
             </Card>
@@ -307,7 +307,7 @@ export default function SetupPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 text-[#22c55e] mb-4">
                   <CheckCircle2 className="w-5 h-5" />
-                  <span className="font-medium">OpenClaw is running</span>
+                  <span className="font-medium">MoltBot is running</span>
                 </div>
                 <p className="text-zinc-400 text-sm mb-4">
                   Provider: <span className="text-zinc-200 capitalize">{status.provider}</span>
@@ -349,8 +349,8 @@ export default function SetupPage() {
                 </CardTitle>
                 <CardDescription className="text-zinc-400">
                   {status?.running && status?.is_owner 
-                    ? 'Restart OpenClaw with a different provider or key'
-                    : 'Enter your LLM provider credentials to start OpenClaw'
+                    ? 'Restart MoltBot with a different provider or key'
+                    : 'Enter your LLM provider credentials to start MoltBot'
                   }
                 </CardDescription>
               </CardHeader>
@@ -426,7 +426,7 @@ export default function SetupPage() {
                       </Button>
                     </div>
                     <p id="apiKeyHelp" className="text-xs text-zinc-500">
-                      Your key is used only to start OpenClaw and is stored securely.
+                      Your key is used only to start MoltBot and is stored securely.
                     </p>
                   </div>
                 )}
@@ -483,7 +483,7 @@ export default function SetupPage() {
                       Starting...
                     </>
                   ) : (
-                    'Start OpenClaw'
+                    'Start MoltBot'
                   )}
                 </Button>
                 
@@ -510,7 +510,7 @@ export default function SetupPage() {
           className="max-w-lg mt-8 text-center text-xs text-zinc-600"
         >
           <p>
-            OpenClaw is an open-source personal AI assistant.{' '}
+            MoltBot is an open-source personal AI assistant.{' '}
             <a 
               href="https://github.com/openclaw/moltbot" 
               target="_blank" 
