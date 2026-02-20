@@ -53,4 +53,4 @@ Build and rebrand the MoltBot/OpenClaw app into **OpenMind** with a polished UI,
 - Scheduler delivery channels + error handling
 - Onboarding reset in Settings
 
-Last updated: 2026-02-20
+Last updated: 2026-02-20 (UTC)
