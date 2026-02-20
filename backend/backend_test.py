@@ -2,7 +2,7 @@ import requests
 import sys
 from datetime import datetime
 
-class MoltbotAPITester:
+class OpenMindAPITester:
     def __init__(self, base_url="https://brave-torvalds.preview.emergent.test/api"):
         self.base_url = base_url
         self.tests_run = 0
@@ -80,26 +80,26 @@ class MoltbotAPITester:
         )
         return success
 
-    def test_moltbot_status_initial(self):
-        """Test Moltbot status endpoint (should not be running initially)"""
+    def test_openmind_status_initial(self):
+        """Test OpenMind status endpoint (should not be running initially)"""
         success, response = self.run_test(
-            "Moltbot Status (Initial)",
+            "OpenMind Status (Initial)",
             "GET",
-            "moltbot/status",
+            "openmind/status",
             200
         )
         if success:
             data = response.json()
             if not data.get('running'):
-                print("   ✓ Moltbot is not running (expected)")
+                print("   ✓ OpenMind is not running (expected)")
                 return True
             else:
-                print("   ⚠ Moltbot is already running")
+                print("   ⚠ OpenMind is already running")
                 return True
         return False
 
-    def test_moltbot_start_validation(self, token=None):
-        """Test Moltbot start endpoint validation"""
+    def test_openmind_start_validation(self, token=None):
+        """Test OpenMind start endpoint validation"""
         print("\n--- Testing Start Endpoint Validation ---")
         
         headers = {'Content-Type': 'application/json'}
@@ -110,7 +110,7 @@ class MoltbotAPITester:
         success1, _ = self.run_test(
             "Start without provider",
             "POST",
-            "moltbot/start",
+            "openmind/start",
             422,  # Validation error
             data={"apiKey": "test-key-1234567890"},
             headers=headers
@@ -120,7 +120,7 @@ class MoltbotAPITester:
         success2, _ = self.run_test(
             "Start with invalid provider",
             "POST",
-            "moltbot/start",
+            "openmind/start",
             400,
             data={"provider": "invalid", "apiKey": "test-key-1234567890"},
             headers=headers
@@ -130,7 +130,7 @@ class MoltbotAPITester:
         success3, _ = self.run_test(
             "Start with short API key",
             "POST",
-            "moltbot/start",
+            "openmind/start",
             400,
             data={"provider": "anthropic", "apiKey": "short"},
             headers=headers
@@ -173,28 +173,28 @@ class MoltbotAPITester:
             401
         )
         
-        # Test POST /moltbot/start without token
+        # Test POST /openmind/start without token
         success2, _ = self.run_test(
-            "POST /moltbot/start (unauthenticated)",
+            "POST /openmind/start (unauthenticated)",
             "POST",
-            "moltbot/start",
+            "openmind/start",
             401,
             data={"provider": "anthropic", "apiKey": "sk-ant-test-1234567890"}
         )
         
-        # Test POST /moltbot/stop without token
+        # Test POST /openmind/stop without token
         success3, _ = self.run_test(
-            "POST /moltbot/stop (unauthenticated)",
+            "POST /openmind/stop (unauthenticated)",
             "POST",
-            "moltbot/stop",
+            "openmind/stop",
             401
         )
         
-        # Test GET /moltbot/token without token
+        # Test GET /openmind/token without token
         success4, _ = self.run_test(
-            "GET /moltbot/token (unauthenticated)",
+            "GET /openmind/token (unauthenticated)",
             "GET",
-            "moltbot/token",
+            "openmind/token",
             401
         )
         
@@ -227,9 +227,9 @@ class MoltbotAPITester:
         
         return success
 
-    def test_moltbot_status_with_auth(self, token):
-        """Test Moltbot status with authentication"""
-        print("\n--- Testing Moltbot Status (Authenticated) ---")
+    def test_openmind_status_with_auth(self, token):
+        """Test OpenMind status with authentication"""
+        print("\n--- Testing OpenMind Status (Authenticated) ---")
         
         headers = {
             'Content-Type': 'application/json',
@@ -237,9 +237,9 @@ class MoltbotAPITester:
         }
         
         success, response = self.run_test(
-            "GET /moltbot/status (authenticated)",
+            "GET /openmind/status (authenticated)",
             "GET",
-            "moltbot/status",
+            "openmind/status",
             200,
             headers=headers
         )
@@ -273,10 +273,10 @@ class MoltbotAPITester:
         return success
 
     def test_ownership_access_control(self, owner_token, other_token):
-        """Test that only owner can access their Moltbot instance"""
+        """Test that only owner can access their OpenMind instance"""
         print("\n--- Testing Ownership & Access Control ---")
         
-        # Note: We can't actually start Moltbot without valid API keys
+        # Note: We can't actually start OpenMind without valid API keys
         # So we'll test the access control logic by checking status responses
         
         owner_headers = {
@@ -293,7 +293,7 @@ class MoltbotAPITester:
         success1, response1 = self.run_test(
             "Owner checks status",
             "GET",
-            "moltbot/status",
+            "openmind/status",
             200,
             headers=owner_headers
         )
@@ -301,17 +301,17 @@ class MoltbotAPITester:
         success2, response2 = self.run_test(
             "Other user checks status",
             "GET",
-            "moltbot/status",
+            "openmind/status",
             200,
             headers=other_headers
         )
         
-        # Test 2: If Moltbot is not running, both should see running=False
+        # Test 2: If OpenMind is not running, both should see running=False
         if success1 and success2:
             data1 = response1.json()
             data2 = response2.json()
             if not data1.get('running') and not data2.get('running'):
-                print("   ✓ Both users see Moltbot is not running")
+                print("   ✓ Both users see OpenMind is not running")
             
         return success1 and success2
 
@@ -338,7 +338,7 @@ def main():
     print("="*60)
     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
-    tester = MoltbotAPITester()
+    tester = OpenMindAPITester()
     
     # Get test tokens from environment or use hardcoded test tokens
     import os
@@ -358,12 +358,12 @@ def main():
     print("\n--- Authentication Tests (With Token) ---")
     tester.test_auth_with_token(owner_token)
     
-    print("\n--- Moltbot Status Tests ---")
-    tester.test_moltbot_status_initial()
-    tester.test_moltbot_status_with_auth(owner_token)
+    print("\n--- OpenMind Status Tests ---")
+    tester.test_openmind_status_initial()
+    tester.test_openmind_status_with_auth(owner_token)
     
-    print("\n--- Moltbot Start Validation Tests ---")
-    tester.test_moltbot_start_validation(owner_token)
+    print("\n--- OpenMind Start Validation Tests ---")
+    tester.test_openmind_start_validation(owner_token)
     
     print("\n--- Legacy Endpoints Tests ---")
     tester.test_legacy_status_endpoints()

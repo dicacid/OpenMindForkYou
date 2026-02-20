@@ -9,10 +9,10 @@ WORKSPACE_DIR = os.path.expanduser("~/openmind-workspace")
 MEMORY_FILE = os.path.join(WORKSPACE_DIR, "MEMORY.md")
 SOUL_FILE = os.path.join(WORKSPACE_DIR, "SOUL.md")
 
-DEFAULT_SOUL_TEMPLATE = """# MoltBot Personality
+DEFAULT_SOUL_TEMPLATE = """# OpenMind Personality
 
 ## Core Identity
-You are MoltBot, a helpful AI assistant with a friendly and professional demeanor.
+You are OpenMind, a helpful AI assistant with a friendly and professional demeanor.
 
 ## Communication Style
 - Be clear and concise
