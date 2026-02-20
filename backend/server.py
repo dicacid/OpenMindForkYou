@@ -1136,6 +1136,109 @@ async def websocket_proxy(websocket: WebSocket):
             pass
 
 
+# ============== Memory Manager Endpoints ==============
+
+@api_router.get("/memory/get")
+async def get_memory(request: Request):
+    """Get MEMORY.md content"""
+    await require_auth(request)
+    content = get_memory_content()
+    last_modified = get_last_modified(MEMORY_FILE)
+    return {
+        "content": content,
+        "last_modified": last_modified
+    }
+
+
+@api_router.post("/memory/save")
+async def save_memory(req: MemorySaveRequest, request: Request):
+    """Save MEMORY.md content"""
+    await require_auth(request)
+    result = save_memory_content(req.content)
+    return result
+
+
+@api_router.post("/memory/add-entry")
+async def add_entry(req: MemoryAddEntryRequest, request: Request):
+    """Add a new entry to MEMORY.md"""
+    await require_auth(request)
+    content = add_memory_entry(req.type, req.content)
+    
+    # Also store in timeline
+    await db.memory_timeline.insert_one({
+        "type": req.type,
+        "content": req.content,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    return {"ok": True, "content": content}
+
+
+@api_router.post("/memory/clear-section")
+async def clear_section(req: MemoryClearSectionRequest, request: Request):
+    """Clear a section from MEMORY.md"""
+    await require_auth(request)
+    content = clear_memory_section(req.section_type)
+    return {"ok": True, "content": content}
+
+
+@api_router.get("/memory/timeline")
+async def get_timeline(request: Request):
+    """Get memory timeline entries"""
+    await require_auth(request)
+    
+    entries = await db.memory_timeline.find(
+        {},
+        {"_id": 0, "created_at": 0}
+    ).sort("timestamp", -1).limit(100).to_list(100)
+    
+    return {"entries": entries}
+
+
+@api_router.delete("/memory/timeline/{index}")
+async def delete_timeline_entry(index: int, request: Request):
+    """Delete a timeline entry by index"""
+    await require_auth(request)
+    
+    # Get all entries, delete by index, and rebuild
+    entries = await db.memory_timeline.find({}).sort("timestamp", -1).to_list(100)
+    if 0 <= index < len(entries):
+        entry_id = entries[index]["_id"]
+        await db.memory_timeline.delete_one({"_id": entry_id})
+        return {"ok": True}
+    
+    raise HTTPException(status_code=404, detail="Entry not found")
+
+
+@api_router.get("/soul/get")
+async def get_soul(request: Request):
+    """Get SOUL.md content"""
+    await require_auth(request)
+    content = get_soul_content()
+    last_modified = get_last_modified(SOUL_FILE)
+    return {
+        "content": content,
+        "last_modified": last_modified
+    }
+
+
+@api_router.post("/soul/save")
+async def save_soul(req: MemorySaveRequest, request: Request):
+    """Save SOUL.md content"""
+    await require_auth(request)
+    result = save_soul_content(req.content)
+    return result
+
+
+@api_router.post("/soul/reset")
+async def reset_soul(request: Request):
+    """Reset SOUL.md to default template"""
+    await require_auth(request)
+    content = reset_soul_to_default()
+    return {"ok": True, "content": content}
+
+
 # ============== Legacy Status Endpoints ==============
 
 @api_router.post("/status", response_model=StatusCheck)
