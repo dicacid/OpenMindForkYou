@@ -33,6 +33,7 @@ Build and rebrand the MoltBot/OpenClaw app into **OpenMind** with a polished UI,
 - `/api/openmind/start` now calls real gateway startup logic and writes config/env correctly for supervisor runtime
 - Added env-driven base URLs for providers
 - Updated gateway env and supervisor program alignment
+- Manual verification: `/api/openmind/status` reachable; UI loads (private instance lock banner)
 
 ## Known Issues
 - Start flow requires authenticated owner session; needs user verification after login (auth lock is active)
