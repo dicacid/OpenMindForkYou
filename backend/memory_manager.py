@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from typing import Optional
 import re
 
-WORKSPACE_DIR = os.path.expanduser("~/clawd")
+WORKSPACE_DIR = os.path.expanduser("~/openmind-workspace")
 MEMORY_FILE = os.path.join(WORKSPACE_DIR, "MEMORY.md")
 SOUL_FILE = os.path.join(WORKSPACE_DIR, "SOUL.md")
 
