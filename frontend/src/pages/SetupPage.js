@@ -34,7 +34,7 @@ export default function SetupPage() {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
-    localStorage.setItem('moltbot_onboarding_complete', 'true');
+    localStorage.setItem('openmind_onboarding_complete', 'true');
     checkOpenClawStatus();
   };
 
@@ -65,7 +65,7 @@ export default function SetupPage() {
     checkAuth();
     
     // Check if onboarding is needed
-    const onboardingComplete = localStorage.getItem('moltbot_onboarding_complete');
+    const onboardingComplete = localStorage.getItem('openmind_onboarding_complete');
     if (!onboardingComplete) {
       setShowOnboarding(true);
     }
@@ -81,7 +81,7 @@ export default function SetupPage() {
         const data = await res.json();
         setStatus(data);
         if (data.running && data.is_owner) {
-          toast.success('MoltBot is already running!');
+          toast.success('OpenMind is already running!');
         }
       }
     } catch (e) {
@@ -94,7 +94,7 @@ export default function SetupPage() {
   const stageText = useMemo(() => {
     if (progress < 10) return 'Waiting to start';
     if (progress < 30) return 'Validating configuration...';
-    if (progress < 60) return 'Starting MoltBot services...';
+    if (progress < 60) return 'Starting OpenMind services...';
     if (progress < 85) return 'Initializing Control UI...';
     if (progress < 95) return 'Almost ready...';
     return 'Redirecting to Control UI';
@@ -139,13 +139,13 @@ export default function SetupPage() {
       });
       if (res.ok) {
         setStatus(null);
-        toast.success('MoltBot stopped');
+        toast.success('OpenMind stopped');
       } else {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.detail || 'Failed to stop MoltBot');
+        toast.error(data.detail || 'Failed to stop OpenMind');
       }
     } catch (e) {
-      toast.error('Failed to stop MoltBot');
+      toast.error('Failed to stop OpenMind');
     }
   };
 
@@ -196,7 +196,7 @@ export default function SetupPage() {
 
       const data = await res.json();
       setProgress(95);
-      toast.success('MoltBot started successfully!');
+      toast.success('OpenMind started successfully!');
       
       // Build the Control UI URL with token for authentication
       // The Control UI accepts token as a query parameter which it stores in localStorage
@@ -212,7 +212,7 @@ export default function SetupPage() {
 
     } catch (e) {
       console.error(e);
-      setError(e.message || 'Unable to start MoltBot');
+      setError(e.message || 'Unable to start OpenMind');
       toast.error('Startup error: ' + (e.message || 'Unknown error'));
       setLoading(false);
       setProgress(0);
@@ -224,7 +224,7 @@ export default function SetupPage() {
       <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center">
         <div className="text-zinc-400 flex items-center gap-2">
           <Loader2 className="w-5 h-5 animate-spin" />
-          {isAuthenticated === null ? 'Checking authentication...' : 'Checking MoltBot status...'}
+          {isAuthenticated === null ? 'Checking authentication...' : 'Checking OpenMind status...'}
         </div>
       </div>
     );
@@ -252,11 +252,11 @@ export default function SetupPage() {
             <div className="flex items-center gap-3 mb-2">
               <OpenClaw size={36} />
               <h1 className="heading text-2xl sm:text-3xl font-semibold tracking-tight">
-                MoltBot Setup
+                OpenMind Setup
               </h1>
             </div>
             <p className="text-zinc-400 text-sm sm:text-base">
-              Connect your LLM provider to start the MoltBot Control UI.
+              Connect your LLM provider to start the OpenMind Control UI.
             </p>
           </div>
           
@@ -344,10 +344,10 @@ export default function SetupPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 text-yellow-500 mb-4">
                   <AlertCircle className="w-5 h-5" />
-                  <span className="font-medium">MoltBot in use</span>
+                  <span className="font-medium">OpenMind in use</span>
                 </div>
                 <p className="text-zinc-400 text-sm">
-                  Another user is currently using MoltBot. Please wait for them to stop their session.
+                  Another user is currently using OpenMind. Please wait for them to stop their session.
                 </p>
               </CardContent>
             </Card>
@@ -366,7 +366,7 @@ export default function SetupPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 text-[#22c55e] mb-4">
                   <CheckCircle2 className="w-5 h-5" />
-                  <span className="font-medium">MoltBot is running</span>
+                  <span className="font-medium">OpenMind is running</span>
                 </div>
                 <p className="text-zinc-400 text-sm mb-4">
                   Provider: <span className="text-zinc-200 capitalize">{status.provider}</span>
@@ -384,7 +384,7 @@ export default function SetupPage() {
                     onClick={handleStopOpenClaw}
                     variant="outline"
                     className="border-zinc-700 hover:bg-zinc-800 text-zinc-300"
-                    data-testid="stop-moltbot-button"
+                    data-testid="stop-openmind-button"
                   >
                     Stop
                   </Button>
@@ -408,8 +408,8 @@ export default function SetupPage() {
                 </CardTitle>
                 <CardDescription className="text-zinc-400">
                   {status?.running && status?.is_owner 
-                    ? 'Restart MoltBot with a different provider or key'
-                    : 'Enter your LLM provider credentials to start MoltBot'
+                    ? 'Restart OpenMind with a different provider or key'
+                    : 'Enter your LLM provider credentials to start OpenMind'
                   }
                 </CardDescription>
               </CardHeader>
@@ -485,7 +485,7 @@ export default function SetupPage() {
                       </Button>
                     </div>
                     <p id="apiKeyHelp" className="text-xs text-zinc-500">
-                      Your key is used only to start MoltBot and is stored securely.
+                      Your key is used only to start OpenMind and is stored securely.
                     </p>
                   </div>
                 )}
@@ -532,7 +532,7 @@ export default function SetupPage() {
               <CardFooter className="flex flex-col sm:flex-row justify-between gap-4 pt-2">
                 <Button
                   onClick={start}
-                  data-testid="start-moltbot-button"
+                  data-testid="start-openmind-button"
                   disabled={loading || !provider || (provider !== 'emergent' && !apiKey) || (status?.running && !status?.is_owner)}
                   className="w-full sm:w-auto bg-[#FF4500] hover:bg-[#E63E00] text-white font-medium h-11 px-6 btn-primary"
                 >
@@ -542,7 +542,7 @@ export default function SetupPage() {
                       Starting...
                     </>
                   ) : (
-                    'Start MoltBot'
+                    'Start OpenMind'
                   )}
                 </Button>
                 
@@ -569,9 +569,9 @@ export default function SetupPage() {
           className="max-w-lg mt-8 text-center text-xs text-zinc-600"
         >
           <p>
-            MoltBot is an open-source personal AI assistant.{' '}
+            OpenMind is an open-source personal AI assistant.{' '}
             <a 
-              href="https://github.com/openclaw/moltbot" 
+              href="https://github.com/openclaw/openmind" 
               target="_blank" 
               rel="noreferrer"
               className="text-zinc-500 hover:text-zinc-400 underline underline-offset-2"
