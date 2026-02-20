@@ -75,12 +75,12 @@ export default function LoginPage() {
               <OpenClaw size={48} />
             </div>
             <CardTitle className="heading text-2xl font-semibold">
-              MoltBot Setup
+              OpenMind Setup
             </CardTitle>
             <CardDescription className="text-zinc-400">
               {instanceLock?.locked 
                 ? 'This is a private instance. Only the owner can sign in.'
-                : 'Sign in with Google to configure and access your personal MoltBot instance.'
+                : 'Sign in with Google to configure and access your personal OpenMind instance.'
               }
             </CardDescription>
           </CardHeader>
@@ -94,7 +94,7 @@ export default function LoginPage() {
                     <span className="font-medium">Private Instance</span>
                   </div>
                   <p className="text-red-400/80">
-                    This MoltBot instance is private and access is restricted.
+                    This OpenMind instance is private and access is restricted.
                   </p>
                 </div>
                 <button
@@ -133,7 +133,7 @@ export default function LoginPage() {
                 </Button>
                 
                 <p className="text-xs text-zinc-500 text-center">
-                  Your MoltBot instance will be private and only accessible by you.
+                  Your OpenMind instance will be private and only accessible by you.
                 </p>
               </>
             )}
@@ -143,12 +143,12 @@ export default function LoginPage() {
         <p className="text-xs text-zinc-600 text-center mt-6">
           Powered by{' '}
           <a
-            href="https://github.com/openclaw/moltbot"
+            href="https://github.com/openclaw/openmind"
             target="_blank"
             rel="noreferrer"
             className="text-zinc-500 hover:text-zinc-400 underline underline-offset-2"
           >
-            MoltBot
+            OpenMind
           </a>
         </p>
       </motion.div>
