@@ -161,6 +161,22 @@ class SkillToggleRequest(BaseModel):
     enabled: bool
 
 
+class CronParseRequest(BaseModel):
+    cron_expression: str
+
+
+class JobCreateRequest(BaseModel):
+    name: str
+    cron_expression: str
+    prompt: str
+    delivery_channel: str
+    active: bool = True
+
+
+class JobToggleRequest(BaseModel):
+    active: bool
+
+
 # ============== Authentication Helpers ==============
 
 EMERGENT_AUTH_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
