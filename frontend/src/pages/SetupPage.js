@@ -243,6 +243,16 @@ export default function SetupPage() {
           
           {/* User info and logout */}
           <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/memory')}
+              data-testid="memory-manager-button"
+              className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Memory</span>
+            </Button>
             {user && (
               <div className="flex items-center gap-2 text-sm text-zinc-400">
                 {user.picture ? (
