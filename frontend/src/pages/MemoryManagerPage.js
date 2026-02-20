@@ -98,7 +98,7 @@ function AddMemoryDialog({ open, onOpenChange, onAdd }) {
                   variant={type === t ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setType(t)}
-                  className={type === t ? 'bg-[#FF4500] hover:bg-[#E63E00]' : ''}
+                  className={type === t ? 'bg-[#8B5CF6] hover:bg-[#7C3AED]' : ''}
                 >
                   {t.charAt(0).toUpperCase() + t.slice(1)}
                 </Button>
@@ -112,7 +112,7 @@ function AddMemoryDialog({ open, onOpenChange, onAdd }) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={`Enter your ${type} here...`}
-              className="w-full h-32 px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4500] resize-none"
+              className="w-full h-32 px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] resize-none"
             />
           </div>
         </div>
@@ -121,7 +121,7 @@ function AddMemoryDialog({ open, onOpenChange, onAdd }) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleAdd} className="bg-[#FF4500] hover:bg-[#E63E00]">
+          <Button onClick={handleAdd} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
             <Plus className="w-4 h-4 mr-2" />
             Add Entry
           </Button>
@@ -186,7 +186,7 @@ function SummarizeDialog({ open, onOpenChange, content, onConfirm }) {
           <Button 
             onClick={handleConfirm} 
             disabled={summarizing}
-            className="bg-[#FF4500] hover:bg-[#E63E00]"
+            className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
           >
             <Save className="w-4 h-4 mr-2" />
             Approve & Save
@@ -229,7 +229,7 @@ function MemoryTimeline({ entries, onDelete }) {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium text-[#FF4500] px-2 py-0.5 rounded bg-[#FF4500]/10">
+                        <span className="text-xs font-medium text-[#8B5CF6] px-2 py-0.5 rounded bg-[#8B5CF6]/10">
                           {entry.type}
                         </span>
                         <span className="text-xs text-zinc-500">{entry.timestamp}</span>
@@ -480,7 +480,7 @@ export default function MemoryManagerPage() {
               </Button>
               <Separator orientation="vertical" className="h-6" />
               <h1 className="heading text-xl font-semibold flex items-center gap-2">
-                <Brain className="w-5 h-5 text-[#FF4500]" />
+                <Brain className="w-5 h-5 text-[#8B5CF6]" />
                 Memory Manager
               </h1>
             </div>
@@ -492,15 +492,15 @@ export default function MemoryManagerPage() {
       <main className="container mx-auto px-4 sm:px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-[#141416] border border-[#1f2022]">
-            <TabsTrigger value="memory" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="memory" className="data-[state=active]:bg-[#8B5CF6]">
               <FileText className="w-4 h-4 mr-2" />
               MEMORY.md
             </TabsTrigger>
-            <TabsTrigger value="soul" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="soul" className="data-[state=active]:bg-[#8B5CF6]">
               <Sparkles className="w-4 h-4 mr-2" />
               SOUL.md
             </TabsTrigger>
-            <TabsTrigger value="timeline" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="timeline" className="data-[state=active]:bg-[#8B5CF6]">
               <Clock className="w-4 h-4 mr-2" />
               Timeline
             </TabsTrigger>
@@ -535,7 +535,7 @@ export default function MemoryManagerPage() {
                   size="sm"
                   onClick={saveMemory}
                   disabled={saving}
-                  className="bg-[#FF4500] hover:bg-[#E63E00]"
+                  className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
                 >
                   {saving ? (
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -570,7 +570,7 @@ export default function MemoryManagerPage() {
                     </div>
                   </Panel>
                   
-                  <PanelResizeHandle className="w-1 bg-[#1f2022] hover:bg-[#FF4500] transition-colors" />
+                  <PanelResizeHandle className="w-1 bg-[#1f2022] hover:bg-[#8B5CF6] transition-colors" />
                   
                   <Panel defaultSize={50} minSize={30}>
                     <div className="h-[600px] flex flex-col">
@@ -611,7 +611,7 @@ export default function MemoryManagerPage() {
                   size="sm"
                   onClick={saveSoul}
                   disabled={saving}
-                  className="bg-[#FF4500] hover:bg-[#E63E00]"
+                  className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
                 >
                   {saving ? (
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />

@@ -84,7 +84,7 @@ function WelcomeStep({ onNext }) {
         <h1 className="heading text-4xl font-bold text-zinc-100">
           Welcome to OpenMind
         </h1>
-        <p className="text-2xl text-[#FF4500] font-medium">
+        <p className="text-2xl text-[#8B5CF6] font-medium">
           Your AI That Actually Does Things
         </p>
         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
@@ -96,7 +96,7 @@ function WelcomeStep({ onNext }) {
       <Button
         onClick={onNext}
         size="lg"
-        className="bg-[#FF4500] hover:bg-[#E63E00] text-lg px-8 py-6"
+        className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-lg px-8 py-6"
       >
         Let's Get Started
         <ArrowRight className="w-5 h-5 ml-2" />
@@ -165,7 +165,7 @@ function NameStep({ data, onChange, onNext, onPrev }) {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
-        <Button onClick={handleNext} className="bg-[#FF4500] hover:bg-[#E63E00]">
+        <Button onClick={handleNext} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
           Continue
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
@@ -245,7 +245,7 @@ function ProviderStep({ data, onChange, onNext, onPrev }) {
             key={p.id}
             className={`cursor-pointer transition-all border-2 ${
               selectedProvider === p.id
-                ? 'border-[#FF4500] bg-[#FF4500]/5'
+                ? 'border-[#8B5CF6] bg-[#8B5CF6]/5'
                 : 'border-[#1f2022] hover:border-[#2f3032]'
             }`}
             onClick={() => setSelectedProvider(p.id)}
@@ -258,7 +258,7 @@ function ProviderStep({ data, onChange, onNext, onPrev }) {
                   <p className="text-sm text-zinc-400 mt-1">{p.description}</p>
                 </div>
                 {selectedProvider === p.id && (
-                  <div className="w-6 h-6 rounded-full bg-[#FF4500] flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full bg-[#8B5CF6] flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" />
                   </div>
                 )}
@@ -319,7 +319,7 @@ function ProviderStep({ data, onChange, onNext, onPrev }) {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
-        <Button onClick={handleNext} className="bg-[#FF4500] hover:bg-[#E63E00]">
+        <Button onClick={handleNext} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
           Continue
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
@@ -356,7 +356,7 @@ function AccessModeStep({ data, onChange, onNext, onPrev }) {
         <Card
           className={`cursor-pointer transition-all border-2 ${
             selectedMode === 'sandbox'
-              ? 'border-[#FF4500] bg-[#FF4500]/5'
+              ? 'border-[#8B5CF6] bg-[#8B5CF6]/5'
               : 'border-[#1f2022] hover:border-[#2f3032]'
           }`}
           onClick={() => setSelectedMode('sandbox')}
@@ -365,7 +365,7 @@ function AccessModeStep({ data, onChange, onNext, onPrev }) {
             <div className="flex items-center justify-between">
               <Shield className="w-8 h-8 text-green-500" />
               {selectedMode === 'sandbox' && (
-                <div className="w-6 h-6 rounded-full bg-[#FF4500] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#8B5CF6] flex items-center justify-center">
                   <Check className="w-4 h-4 text-white" />
                 </div>
               )}
@@ -396,7 +396,7 @@ function AccessModeStep({ data, onChange, onNext, onPrev }) {
         <Card
           className={`cursor-pointer transition-all border-2 ${
             selectedMode === 'host'
-              ? 'border-[#FF4500] bg-[#FF4500]/5'
+              ? 'border-[#8B5CF6] bg-[#8B5CF6]/5'
               : 'border-[#1f2022] hover:border-[#2f3032]'
           }`}
           onClick={() => setSelectedMode('host')}
@@ -405,7 +405,7 @@ function AccessModeStep({ data, onChange, onNext, onPrev }) {
             <div className="flex items-center justify-between">
               <Unlock className="w-8 h-8 text-orange-500" />
               {selectedMode === 'host' && (
-                <div className="w-6 h-6 rounded-full bg-[#FF4500] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#8B5CF6] flex items-center justify-center">
                   <Check className="w-4 h-4 text-white" />
                 </div>
               )}
@@ -439,7 +439,7 @@ function AccessModeStep({ data, onChange, onNext, onPrev }) {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
-        <Button onClick={handleNext} className="bg-[#FF4500] hover:bg-[#E63E00]">
+        <Button onClick={handleNext} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
           Continue
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
@@ -487,7 +487,7 @@ function MessagingStep({ data, onChange, onNext, onPrev }) {
             key={app.id}
             className={`border-2 transition-all ${
               connected.includes(app.id)
-                ? 'border-[#FF4500] bg-[#FF4500]/5'
+                ? 'border-[#8B5CF6] bg-[#8B5CF6]/5'
                 : 'border-[#1f2022]'
             }`}
           >
@@ -497,7 +497,7 @@ function MessagingStep({ data, onChange, onNext, onPrev }) {
                 <h3 className="text-lg font-semibold text-zinc-100">{app.name}</h3>
                 <Button
                   variant={connected.includes(app.id) ? 'default' : 'outline'}
-                  className={connected.includes(app.id) ? 'bg-[#FF4500] hover:bg-[#E63E00]' : 'border-[#1f2022]'}
+                  className={connected.includes(app.id) ? 'bg-[#8B5CF6] hover:bg-[#7C3AED]' : 'border-[#1f2022]'}
                   onClick={() => handleConnect(app.id)}
                 >
                   {connected.includes(app.id) ? (
@@ -524,7 +524,7 @@ function MessagingStep({ data, onChange, onNext, onPrev }) {
           <Button variant="outline" onClick={handleNext} className="border-[#1f2022]">
             Skip
           </Button>
-          <Button onClick={handleNext} className="bg-[#FF4500] hover:bg-[#E63E00]">
+          <Button onClick={handleNext} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
             Continue
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -626,7 +626,7 @@ function SummaryStep({ data, onComplete }) {
         onClick={handleLaunch}
         disabled={launching}
         size="lg"
-        className="bg-[#FF4500] hover:bg-[#E63E00] text-lg px-8 py-6"
+        className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-lg px-8 py-6"
       >
         {launching ? (
           <>

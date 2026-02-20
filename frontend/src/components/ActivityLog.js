@@ -47,10 +47,10 @@ export default function ActivityLog() {
         className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#141416] transition-colors"
       >
         <div className="flex items-center gap-2 text-xs text-zinc-400">
-          <Activity className="w-3.5 h-3.5 text-[#FF4500] animate-pulse" />
+          <Activity className="w-3.5 h-3.5 text-[#8B5CF6] animate-pulse" />
           <span className="truncate">
             {lastActivity.assistant_name || 'Mind'} ran{' '}
-            <span className="text-[#FF4500] font-medium">{lastActivity.tool_name}</span>{' '}
+            <span className="text-[#8B5CF6] font-medium">{lastActivity.tool_name}</span>{' '}
             {timeAgo(lastActivity.timestamp)}
           </span>
         </div>

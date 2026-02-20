@@ -44,7 +44,7 @@ function ToolCallPanel({ calls, expanded }) {
                 <CardContent className="p-3">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Badge className="bg-[#FF4500]/10 text-[#FF4500] border-[#FF4500]/20">
+                      <Badge className="bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20">
                         {call.tool_name}
                       </Badge>
                       <span className="text-xs text-zinc-500">
@@ -148,7 +148,7 @@ export default function ChatPage() {
               </Button>
               <div className="h-6 w-px bg-[#1f2022]" />
               <h1 className="heading text-xl font-semibold flex items-center gap-2">
-                <Bot className="w-5 h-5 text-[#FF4500]" />
+                <Bot className="w-5 h-5 text-[#8B5CF6]" />
                 Chat with Mind
               </h1>
             </div>
@@ -190,14 +190,14 @@ export default function ChatPage() {
                   className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}
                 >
                   {msg.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-[#FF4500]/10 flex items-center justify-center flex-shrink-0">
-                      <Bot className="w-5 h-5 text-[#FF4500]" />
+                    <div className="w-8 h-8 rounded-full bg-[#8B5CF6]/10 flex items-center justify-center flex-shrink-0">
+                      <Bot className="w-5 h-5 text-[#8B5CF6]" />
                     </div>
                   )}
                   <div
                     className={`max-w-2xl px-4 py-3 rounded-lg ${
                       msg.role === 'user'
-                        ? 'bg-[#FF4500] text-white'
+                        ? 'bg-[#8B5CF6] text-white'
                         : 'bg-[#141416] text-zinc-100 border border-[#1f2022]'
                     }`}
                   >
@@ -217,8 +217,8 @@ export default function ChatPage() {
                   animate={{ opacity: 1 }}
                   className="flex gap-3"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#FF4500]/10 flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-[#FF4500]" />
+                  <div className="w-8 h-8 rounded-full bg-[#8B5CF6]/10 flex items-center justify-center">
+                    <Bot className="w-5 h-5 text-[#8B5CF6]" />
                   </div>
                   <div className="px-4 py-3 rounded-lg bg-[#141416] border border-[#1f2022]">
                     <Loader2 className="w-5 h-5 animate-spin text-zinc-500" />
@@ -243,7 +243,7 @@ export default function ChatPage() {
               <Button
                 onClick={sendMessage}
                 disabled={loading || !input.trim()}
-                className="bg-[#FF4500] hover:bg-[#E63E00]"
+                className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
               >
                 <Send className="w-4 h-4" />
               </Button>

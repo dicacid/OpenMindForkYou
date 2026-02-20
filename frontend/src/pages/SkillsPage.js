@@ -326,7 +326,7 @@ function SkillCard({ skill, isInstalled, onInstall, onUninstall, onConfigure, on
             <Button
               onClick={() => handleAction(onInstall)}
               disabled={loading}
-              className="w-full bg-[#FF4500] hover:bg-[#E63E00]"
+              className="w-full bg-[#8B5CF6] hover:bg-[#7C3AED]"
               size="sm"
             >
               {loading ? (
@@ -405,7 +405,7 @@ function ConfigureModal({ open, onOpenChange, skill, config, onSave }) {
                     onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                     placeholder={field.placeholder}
                     rows={3}
-                    className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4500] resize-none"
+                    className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] resize-none"
                   />
                 )}
                 
@@ -413,7 +413,7 @@ function ConfigureModal({ open, onOpenChange, skill, config, onSave }) {
                   <select
                     value={formData[key] || field.default}
                     onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                    className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4500]"
+                    className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]"
                   >
                     {field.options.map((opt) => (
                       <option key={opt} value={opt}>{opt}</option>
@@ -450,7 +450,7 @@ function ConfigureModal({ open, onOpenChange, skill, config, onSave }) {
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving} className="bg-[#FF4500] hover:bg-[#E63E00]">
+          <Button onClick={handleSave} disabled={saving} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
             {saving ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -605,7 +605,7 @@ export default function SkillsPage() {
               </Button>
               <div className="h-6 w-px bg-[#1f2022]" />
               <h1 className="heading text-xl font-semibold flex items-center gap-2">
-                <Package className="w-5 h-5 text-[#FF4500]" />
+                <Package className="w-5 h-5 text-[#8B5CF6]" />
                 MindHub Skills
               </h1>
             </div>
@@ -617,11 +617,11 @@ export default function SkillsPage() {
       <main className="container mx-auto px-4 sm:px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-[#141416] border border-[#1f2022]">
-            <TabsTrigger value="registry" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="registry" className="data-[state=active]:bg-[#8B5CF6]">
               <Sparkles className="w-4 h-4 mr-2" />
               Registry ({MOCK_SKILLS.length})
             </TabsTrigger>
-            <TabsTrigger value="installed" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="installed" className="data-[state=active]:bg-[#8B5CF6]">
               <Package className="w-4 h-4 mr-2" />
               Installed ({installedSkills.length})
             </TabsTrigger>
@@ -651,7 +651,7 @@ export default function SkillsPage() {
                     onClick={() => setSelectedCategory(cat)}
                     className={
                       selectedCategory === cat
-                        ? 'bg-[#FF4500] hover:bg-[#E63E00]'
+                        ? 'bg-[#8B5CF6] hover:bg-[#7C3AED]'
                         : 'border-[#1f2022] hover:bg-[#1f2022]'
                     }
                   >
@@ -694,7 +694,7 @@ export default function SkillsPage() {
                 <p>No skills installed yet</p>
                 <Button
                   onClick={() => setActiveTab('registry')}
-                  className="mt-4 bg-[#FF4500] hover:bg-[#E63E00]"
+                  className="mt-4 bg-[#8B5CF6] hover:bg-[#7C3AED]"
                   size="sm"
                 >
                   Browse Registry

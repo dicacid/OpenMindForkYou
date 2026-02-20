@@ -374,7 +374,7 @@ export default function SetupPage() {
                 <div className="flex gap-3">
                   <Button
                     onClick={goToControlUI}
-                    className="flex-1 bg-[#FF4500] hover:bg-[#E63E00] text-white"
+                    className="flex-1 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white"
                     data-testid="control-ui-redirect"
                   >
                     Open Control UI
@@ -429,7 +429,7 @@ export default function SetupPage() {
                     <SelectTrigger 
                       id="provider" 
                       data-testid="provider-select"
-                      className="bg-[#0f0f10] border-[#1f2022] focus:ring-[#FF4500] focus:ring-offset-0 h-11"
+                      className="bg-[#0f0f10] border-[#1f2022] focus:ring-[#8B5CF6] focus:ring-offset-0 h-11"
                     >
                       <SelectValue placeholder="Choose provider" />
                     </SelectTrigger>
@@ -464,7 +464,7 @@ export default function SetupPage() {
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
                         disabled={loading}
-                        className="pr-20 tracking-wider bg-[#0f0f10] border-[#1f2022] focus-visible:ring-[#FF4500] focus-visible:ring-offset-0 h-11 api-key-input"
+                        className="pr-20 tracking-wider bg-[#0f0f10] border-[#1f2022] focus-visible:ring-[#8B5CF6] focus-visible:ring-offset-0 h-11 api-key-input"
                         placeholder={provider === 'openai' ? 'sk-...' : 'sk-ant-...'}
                         aria-describedby="apiKeyHelp"
                       />
@@ -516,7 +516,7 @@ export default function SetupPage() {
                       className="h-2 bg-[#1f2022]"
                     />
                     <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-[#FF4500]" />
+                      <Loader2 className="w-4 h-4 animate-spin text-[#8B5CF6]" />
                       <p 
                         className="text-sm text-zinc-400" 
                         data-testid="startup-status-text"
@@ -534,7 +534,7 @@ export default function SetupPage() {
                   onClick={start}
                   data-testid="start-openmind-button"
                   disabled={loading || !provider || (provider !== 'emergent' && !apiKey) || (status?.running && !status?.is_owner)}
-                  className="w-full sm:w-auto bg-[#FF4500] hover:bg-[#E63E00] text-white font-medium h-11 px-6 btn-primary"
+                  className="w-full sm:w-auto bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-medium h-11 px-6 btn-primary"
                 >
                   {loading ? (
                     <>

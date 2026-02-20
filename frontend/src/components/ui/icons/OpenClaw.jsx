@@ -32,13 +32,13 @@ const OpenClaw = ({ className, size = 120, ...props }) => {
       {/* Antenna */}
       <path
         d="M45 15 Q35 5 30 8"
-        stroke="#FF4500"
+        stroke="#8B5CF6"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
         d="M75 15 Q85 5 90 8"
-        stroke="#FF4500"
+        stroke="#8B5CF6"
         strokeWidth="2"
         strokeLinecap="round"
       />
@@ -49,7 +49,7 @@ const OpenClaw = ({ className, size = 120, ...props }) => {
       <circle cx="76" cy="34" r="2" fill="#22D3EE" />
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FF4500" />
+          <stop offset="0%" stopColor="#8B5CF6" />
           <stop offset="100%" stopColor="#CC3700" />
         </linearGradient>
       </defs>

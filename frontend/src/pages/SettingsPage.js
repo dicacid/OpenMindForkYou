@@ -96,7 +96,7 @@ function AuditLogTab() {
         <Button
           onClick={exportToCSV}
           disabled={logs.length === 0}
-          className="bg-[#FF4500] hover:bg-[#E63E00]"
+          className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
         >
           <Download className="w-4 h-4 mr-2" />
           Export CSV
@@ -135,7 +135,7 @@ function AuditLogTab() {
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
                       <td className="py-3">
-                        <Badge className="bg-[#FF4500]/10 text-[#FF4500] border-[#FF4500]/20">
+                        <Badge className="bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20">
                           {log.tool_name}
                         </Badge>
                       </td>
@@ -230,7 +230,7 @@ export default function SettingsPage() {
               </Button>
               <Separator orientation="vertical" className="h-6" />
               <h1 className="heading text-xl font-semibold flex items-center gap-2">
-                <SettingsIcon className="w-5 h-5 text-[#FF4500]" />
+                <SettingsIcon className="w-5 h-5 text-[#8B5CF6]" />
                 Settings
               </h1>
             </div>
@@ -242,15 +242,15 @@ export default function SettingsPage() {
       <main className="container mx-auto px-4 sm:px-6 py-6">
         <Tabs defaultValue="general" className="space-y-6">
           <TabsList className="bg-[#141416] border border-[#1f2022]">
-            <TabsTrigger value="general" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="general" className="data-[state=active]:bg-[#8B5CF6]">
               <User className="w-4 h-4 mr-2" />
               General
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="notifications" className="data-[state=active]:bg-[#8B5CF6]">
               <Bell className="w-4 h-4 mr-2" />
               Notifications
             </TabsTrigger>
-            <TabsTrigger value="audit" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="audit" className="data-[state=active]:bg-[#8B5CF6]">
               <History className="w-4 h-4 mr-2" />
               Audit Log
             </TabsTrigger>
@@ -298,7 +298,7 @@ export default function SettingsPage() {
                 <Button
                   onClick={saveConfig}
                   disabled={saving}
-                  className="bg-[#FF4500] hover:bg-[#E63E00]"
+                  className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
                 >
                   {saving ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

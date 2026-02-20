@@ -207,7 +207,7 @@ function JobFormModal({ open, onOpenChange, job, onSave }) {
                     onClick={() => handlePresetSelect(preset)}
                     className={
                       selectedPreset === preset.label
-                        ? 'bg-[#FF4500] hover:bg-[#E63E00]'
+                        ? 'bg-[#8B5CF6] hover:bg-[#7C3AED]'
                         : 'border-[#1f2022] hover:bg-[#1f2022]'
                     }
                   >
@@ -240,7 +240,7 @@ function JobFormModal({ open, onOpenChange, job, onSave }) {
                 onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
                 placeholder="E.g., Check the weather forecast for New York and send me a summary..."
                 rows={4}
-                className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4500] resize-none"
+                className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5CF6] resize-none"
               />
             </div>
 
@@ -250,7 +250,7 @@ function JobFormModal({ open, onOpenChange, job, onSave }) {
               <select
                 value={formData.delivery_channel}
                 onChange={(e) => setFormData({ ...formData, delivery_channel: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4500]"
+                className="w-full px-3 py-2 bg-[#0f0f10] border border-[#1f2022] rounded-md text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]"
               >
                 {DELIVERY_CHANNELS.map((channel) => (
                   <option key={channel.value} value={channel.value}>
@@ -278,7 +278,7 @@ function JobFormModal({ open, onOpenChange, job, onSave }) {
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving} className="bg-[#FF4500] hover:bg-[#E63E00]">
+          <Button onClick={handleSave} disabled={saving} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
             {saving ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -521,7 +521,7 @@ export default function HeartbeatSchedulerPage() {
               </Button>
               <Separator orientation="vertical" className="h-6" />
               <h1 className="heading text-xl font-semibold flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[#FF4500]" />
+                <Clock className="w-5 h-5 text-[#8B5CF6]" />
                 Heartbeat Scheduler
               </h1>
             </div>
@@ -530,7 +530,7 @@ export default function HeartbeatSchedulerPage() {
                 setEditingJob(null);
                 setShowJobModal(true);
               }}
-              className="bg-[#FF4500] hover:bg-[#E63E00]"
+              className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Job
@@ -543,11 +543,11 @@ export default function HeartbeatSchedulerPage() {
       <main className="container mx-auto px-4 sm:px-6 py-6">
         <Tabs defaultValue="jobs" className="space-y-6">
           <TabsList className="bg-[#141416] border border-[#1f2022]">
-            <TabsTrigger value="jobs" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="jobs" className="data-[state=active]:bg-[#8B5CF6]">
               <Calendar className="w-4 h-4 mr-2" />
               Jobs ({jobs.length})
             </TabsTrigger>
-            <TabsTrigger value="history" className="data-[state=active]:bg-[#FF4500]">
+            <TabsTrigger value="history" className="data-[state=active]:bg-[#8B5CF6]">
               <History className="w-4 h-4 mr-2" />
               History
             </TabsTrigger>
@@ -566,7 +566,7 @@ export default function HeartbeatSchedulerPage() {
                   <p className="text-zinc-400 mb-4">No scheduled jobs yet</p>
                   <Button
                     onClick={() => setShowJobModal(true)}
-                    className="bg-[#FF4500] hover:bg-[#E63E00]"
+                    className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Create Your First Job
