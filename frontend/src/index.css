@@ -117,3 +117,124 @@ code {
         border-bottom-color: inherit;
     }
 }
+
+/* Markdown Prose Styling */
+.prose-invert {
+    color: #d4d4d8;
+}
+
+.prose-invert h1,
+.prose-invert h2,
+.prose-invert h3,
+.prose-invert h4,
+.prose-invert h5,
+.prose-invert h6 {
+    color: #fafafa;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+}
+
+.prose-invert h1 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.prose-invert h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    border-bottom: 1px solid #27272a;
+    padding-bottom: 0.5rem;
+}
+
+.prose-invert h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.prose-invert p {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    line-height: 1.75;
+}
+
+.prose-invert a {
+    color: #FF4500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.prose-invert a:hover {
+    color: #E63E00;
+}
+
+.prose-invert strong {
+    color: #fafafa;
+    font-weight: 600;
+}
+
+.prose-invert code {
+    background-color: #18181b;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    color: #FF4500;
+}
+
+.prose-invert pre {
+    background-color: #18181b;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.prose-invert pre code {
+    background-color: transparent;
+    padding: 0;
+    color: #d4d4d8;
+}
+
+.prose-invert ul,
+.prose-invert ol {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    padding-left: 1.5em;
+}
+
+.prose-invert li {
+    margin-top: 0.375em;
+    margin-bottom: 0.375em;
+}
+
+.prose-invert blockquote {
+    border-left: 4px solid #FF4500;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #a1a1aa;
+  font-style: italic;
+}
+
+.prose-invert table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.prose-invert th,
+.prose-invert td {
+    border: 1px solid #27272a;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.prose-invert th {
+    background-color: #18181b;
+    font-weight: 600;
+}
+
+.prose-invert hr {
+    border-color: #27272a;
+    margin: 2rem 0;
+}
+
