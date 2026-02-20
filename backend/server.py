@@ -937,9 +937,6 @@ async def start_openmind(request: OpenMindStartRequest, req: Request):
         raise HTTPException(status_code=400, detail="API key required for this provider")
 
     try:
-        # For MVP/demo: Just save the config and return success
-        # In production, this would start the actual gateway process
-        
         # Save provider and API key to user config
         await db.user_config.update_one(
             {"user_id": user.user_id},
@@ -952,19 +949,24 @@ async def start_openmind(request: OpenMindStartRequest, req: Request):
             },
             upsert=True
         )
-        
+
+        logger.info(f"Starting OpenMind for user: {user.email} with provider: {request.provider}")
+
+        # Start gateway via supervisor
+        token = await start_gateway_process(
+            api_key=request.apiKey,
+            provider=request.provider,
+            owner_user_id=user.user_id
+        )
+
         # Lock the instance to this user on first successful start
         await set_instance_owner(user)
-        logger.info(f"Instance configured for user: {user.email} with provider: {request.provider}")
-
-        # Generate a simple token for the session
-        token = generate_token()
 
         return OpenMindStartResponse(
             ok=True,
-            controlUrl="/chat",  # Redirect to chat page
+            controlUrl="/api/openmind/ui/",
             token=token,
-            message=f"OpenMind configured successfully with {request.provider} provider"
+            message=f"OpenMind started successfully with {request.provider} provider"
         )
     except HTTPException:
         raise
