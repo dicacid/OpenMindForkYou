@@ -230,6 +230,11 @@ export default function SetupPage() {
     );
   }
 
+  // Show onboarding wizard if not completed
+  if (showOnboarding) {
+    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
+  }
+
   return (
     <div className="min-h-screen bg-[#0f0f10] text-zinc-100">
       {/* Subtle texture overlay */}
