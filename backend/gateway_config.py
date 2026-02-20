@@ -10,8 +10,8 @@ import stat
 from pathlib import Path
 
 # Path to the gateway environment file
-GATEWAY_ENV_FILE = "/root/.clawdbot/gateway.env"
-GATEWAY_ENV_DIR = "/root/.clawdbot"
+GATEWAY_ENV_FILE = "/root/.openmind/gateway.env"
+GATEWAY_ENV_DIR = "/root/.openmind"
 
 
 def write_gateway_env(token: str, api_key: str = None, provider: str = "emergent") -> None:
@@ -31,7 +31,7 @@ def write_gateway_env(token: str, api_key: str = None, provider: str = "emergent
 
     # Build environment file content
     lines = [
-        f'export CLAWDBOT_GATEWAY_TOKEN="{token}"',
+        f'export OPENMIND_GATEWAY_TOKEN="{token}"',
     ]
 
     # Add provider-specific API keys

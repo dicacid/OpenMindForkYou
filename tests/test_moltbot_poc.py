@@ -18,7 +18,7 @@ import sys
 
 # Configuration
 MOLTBOT_PORT = 18789
-CONFIG_DIR = os.path.expanduser("~/.clawdbot")
+CONFIG_DIR = os.path.expanduser("~/.openmind")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "moltbot.json")
 WORKSPACE_DIR = os.path.expanduser("~/clawd")
 
@@ -76,7 +76,7 @@ def start_gateway(api_key: str = None, api_provider: str = "anthropic"):
     print(f"🚀 Starting Moltbot gateway on port {MOLTBOT_PORT}...")
     
     process = subprocess.Popen(
-        ["clawdbot", "gateway", "--port", str(MOLTBOT_PORT), "--bind", "loopback", "--verbose"],
+        ["openmind", "gateway", "--port", str(MOLTBOT_PORT), "--bind", "loopback", "--verbose"],
         env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
