@@ -24,6 +24,19 @@ from whatsapp_monitor import get_whatsapp_status, fix_registered_flag
 # Gateway management (supervisor-based)
 from gateway_config import write_gateway_env, clear_gateway_env
 from supervisor_client import SupervisorClient
+# Memory management
+from memory_manager import (
+    get_memory_content,
+    get_soul_content,
+    save_memory_content,
+    save_soul_content,
+    add_memory_entry,
+    clear_memory_section,
+    reset_soul_to_default,
+    get_last_modified,
+    MEMORY_FILE,
+    SOUL_FILE
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
