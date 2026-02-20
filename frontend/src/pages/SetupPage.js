@@ -41,7 +41,12 @@ export default function SetupPage() {
       return;
     }
     
-    const checkAuth = async () => {
+    const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    checkOpenClawStatus();
+  };
+
+  const checkAuth = async () => {
       try {
         const response = await fetch(`${API}/auth/me`, {
           credentials: 'include'
