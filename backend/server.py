@@ -124,6 +124,19 @@ class SessionRequest(BaseModel):
     session_id: str
 
 
+class MemorySaveRequest(BaseModel):
+    content: str
+
+
+class MemoryAddEntryRequest(BaseModel):
+    type: str  # "fact", "preference", "project"
+    content: str
+
+
+class MemoryClearSectionRequest(BaseModel):
+    section_type: str  # "fact", "preference", "project"
+
+
 # ============== Authentication Helpers ==============
 
 EMERGENT_AUTH_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
