@@ -1689,19 +1689,36 @@ async def send_chat_message(req: dict, request: Request):
     
     message = req.get("message", "")
     session_id = req.get("session_id", "default")
+    provider = req.get("provider", "openai")
+    model = req.get("model", None)
     
-    # Simulate response (in production, call actual LLM)
-    response = f"I received your message: {message}. This is a simulated response."
+    try:
+        # Import LLM integration
+        from llm_integration import OpenMindLLM
+        
+        # Get user's API key from config if available
+        user_config = await db.user_config.find_one({"user_id": user.user_id})
+        api_key = user_config.get("api_key") if user_config else None
+        
+        # Initialize LLM
+        llm = OpenMindLLM(provider=provider, model=model, api_key=api_key)
+        
+        # Get response
+        response = await llm.chat(message, session_id=session_id)
+        
+    except Exception as e:
+        # Fallback to simulated response if LLM fails
+        response = f"I received your message: {message}. This is a simulated response (LLM error: {str(e)})."
     
     # Log to audit
     await db.audit_logs.insert_one({
         "user_id": user.user_id,
         "session_id": session_id,
         "tool_name": "chat",
-        "arguments": {"message": message},
+        "arguments": {"message": message, "provider": provider},
         "result": {"response": response},
         "timestamp": datetime.now(timezone.utc),
-        "assistant_name": "Mind"
+        "assistant_name": "OpenMind"
     })
     
     return {"response": response, "tool_calls": []}
