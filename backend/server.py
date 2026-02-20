@@ -851,12 +851,12 @@ async def start_openmind(request: OpenMindStartRequest, req: Request):
     """Start the OpenMind gateway with Emergent provider (requires auth)"""
     user = await require_auth(req)
 
-    if request.provider not in ["emergent", "anthropic", "openai"]:
-        raise HTTPException(status_code=400, detail="Invalid provider. Use 'emergent', 'anthropic', or 'openai'")
+    if request.provider not in ["emergent", "anthropic", "openai", "openrouter", "gemini"]:
+        raise HTTPException(status_code=400, detail="Invalid provider. Use 'emergent', 'anthropic', 'openai', 'openrouter', or 'gemini'")
 
     # For non-emergent providers, API key is required
-    if request.provider in ["anthropic", "openai"] and (not request.apiKey or len(request.apiKey) < 10):
-        raise HTTPException(status_code=400, detail="API key required for anthropic/openai providers")
+    if request.provider in ["anthropic", "openai", "openrouter", "gemini"] and (not request.apiKey or len(request.apiKey) < 10):
+        raise HTTPException(status_code=400, detail="API key required for this provider")
 
     # Check if OpenMind is already running by another user
     if check_gateway_running() and gateway_state["owner_user_id"] != user.user_id:
