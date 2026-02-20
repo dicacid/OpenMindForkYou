@@ -26,6 +26,7 @@ function AppRouter() {
       <Route path="/" element={<SetupPage />} />
       <Route path="/memory" element={<MemoryManagerPage />} />
       <Route path="/skills" element={<SkillsPage />} />
+      <Route path="/scheduler" element={<HeartbeatSchedulerPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
