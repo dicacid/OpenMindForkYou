@@ -100,7 +100,7 @@ class StatusCheckCreate(BaseModel):
 
 
 class OpenMindStartRequest(BaseModel):
-    provider: str = "emergent"  # "emergent", "anthropic", or "openai"
+    provider: str = "emergent"  # "emergent", "anthropic", "openai", "openrouter", or "gemini"
     apiKey: Optional[str] = None  # Optional - uses Emergent key if not provided
 
 
