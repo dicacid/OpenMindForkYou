@@ -65,8 +65,8 @@ api_router = APIRouter(prefix="/api")
 # Moltbot Gateway Management
 MOLTBOT_PORT = 18789
 MOLTBOT_CONTROL_PORT = 18791
-CONFIG_DIR = os.path.expanduser("~/.clawdbot")
-CONFIG_FILE = os.path.join(CONFIG_DIR, "clawdbot.json")
+CONFIG_DIR = os.path.expanduser("~/.openmind")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "openmind.json")
 WORKSPACE_DIR = os.path.expanduser("~/clawd")
 
 # Global state for gateway (per-user)
@@ -433,26 +433,26 @@ async def logout(request: Request, response: Response):
 
 # ============== Moltbot Helpers ==============
 
-# Persistent paths for Node.js and clawdbot
+# Persistent paths for Node.js and openmind
 NODE_DIR = "/root/nodejs"
-CLAWDBOT_DIR = "/root/.clawdbot-bin"
-CLAWDBOT_WRAPPER = "/root/run_clawdbot.sh"
+OPENMIND_DIR = "/root/.openmind-bin"
+OPENMIND_WRAPPER = "/root/run_openmind.sh"
 
-def get_clawdbot_command():
-    """Get the path to clawdbot executable"""
+def get_openmind_command():
+    """Get the path to openmind executable"""
     # Try wrapper script first
-    if os.path.exists(CLAWDBOT_WRAPPER):
-        return CLAWDBOT_WRAPPER
+    if os.path.exists(OPENMIND_WRAPPER):
+        return OPENMIND_WRAPPER
     # Try persistent location
-    if os.path.exists(f"{CLAWDBOT_DIR}/clawdbot"):
-        return f"{CLAWDBOT_DIR}/clawdbot"
-    if os.path.exists(f"{NODE_DIR}/bin/clawdbot"):
-        return f"{NODE_DIR}/bin/clawdbot"
+    if os.path.exists(f"{OPENMIND_DIR}/openmind"):
+        return f"{OPENMIND_DIR}/openmind"
+    if os.path.exists(f"{NODE_DIR}/bin/openmind"):
+        return f"{NODE_DIR}/bin/openmind"
     # Try system path
     import shutil
-    clawdbot_path = shutil.which("clawdbot")
-    if clawdbot_path:
-        return clawdbot_path
+    openmind_path = shutil.which("openmind")
+    if openmind_path:
+        return openmind_path
     return None
 
 
@@ -460,15 +460,15 @@ def ensure_moltbot_installed():
     """Ensure Moltbot dependencies are installed"""
     install_script = "/app/backend/install_moltbot_deps.sh"
 
-    # Check if clawdbot is available
-    clawdbot_cmd = get_clawdbot_command()
-    if clawdbot_cmd:
-        logger.info(f"Clawdbot found at: {clawdbot_cmd}")
+    # Check if openmind is available
+    openmind_cmd = get_openmind_command()
+    if openmind_cmd:
+        logger.info(f"OpenMind found at: {openmind_cmd}")
         return True
 
     # Run installation script if available
     if os.path.exists(install_script):
-        logger.info("Clawdbot not found, running installation script...")
+        logger.info("OpenMind not found, running installation script...")
         try:
             result = subprocess.run(
                 ["bash", install_script],
@@ -486,7 +486,7 @@ def ensure_moltbot_installed():
             logger.error(f"Installation script error: {e}")
             return False
 
-    logger.error("Clawdbot not found and no installation script available")
+    logger.error("OpenMind not found and no installation script available")
     return False
 
 
@@ -496,7 +496,7 @@ def generate_token():
 
 
 def create_moltbot_config(token: str = None, api_key: str = None, provider: str = "emergent", force_new_token: bool = False):
-    """Update clawdbot.json with gateway config and provider settings
+    """Update openmind.json with gateway config and provider settings
 
     Args:
         token: Optional token. If not provided, reuses existing or generates new.
@@ -768,14 +768,14 @@ async def start_gateway_process(api_key: str, provider: str, owner_user_id: str)
 
         return token
 
-    # Ensure clawdbot is installed
-    clawdbot_cmd = get_clawdbot_command()
-    if not clawdbot_cmd:
+    # Ensure openmind is installed
+    openmind_cmd = get_openmind_command()
+    if not openmind_cmd:
         if not ensure_moltbot_installed():
-            raise HTTPException(status_code=500, detail="OpenClaw (clawdbot) is not installed. Please contact support.")
-        clawdbot_cmd = get_clawdbot_command()
-        if not clawdbot_cmd:
-            raise HTTPException(status_code=500, detail="Failed to find clawdbot after installation")
+            raise HTTPException(status_code=500, detail="OpenClaw (openmind) is not installed. Please contact support.")
+        openmind_cmd = get_openmind_command()
+        if not openmind_cmd:
+            raise HTTPException(status_code=500, detail="Failed to find openmind after installation")
 
     # Create config (reuses existing token to avoid gateway restarts)
     token = create_moltbot_config(api_key=api_key, provider=provider)
@@ -1759,7 +1759,7 @@ async def whatsapp_auto_fix_watcher():
                 logger.info("[whatsapp-watcher] DETECTED registered=false, applying fix...")
                 if fix_registered_flag():
                     logger.info("[whatsapp-watcher] Fix applied, restarting gateway via supervisor...")
-                    result = subprocess.run(["supervisorctl", "restart", "clawdbot-gateway"], capture_output=True, text=True)
+                    result = subprocess.run(["supervisorctl", "restart", "openmind-gateway"], capture_output=True, text=True)
                     logger.info(f"[whatsapp-watcher] Supervisor restart result: {result.stdout} {result.stderr}")
         except Exception as e:
             logger.warning(f"[whatsapp-watcher] Error: {e}")
@@ -1776,9 +1776,9 @@ async def startup_event():
     SupervisorClient.reload_config()
 
     # Check and install Moltbot dependencies if needed
-    clawdbot_cmd = get_clawdbot_command()
-    if clawdbot_cmd:
-        logger.info(f"Moltbot dependencies ready: {clawdbot_cmd}")
+    openmind_cmd = get_openmind_command()
+    if openmind_cmd:
+        logger.info(f"Moltbot dependencies ready: {openmind_cmd}")
     else:
         logger.info("Moltbot dependencies not found, will install on first use")
 

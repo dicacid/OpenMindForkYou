@@ -35,7 +35,7 @@ export default function SetupPage() {
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
     localStorage.setItem('openmind_onboarding_complete', 'true');
-    checkOpenClawStatus();
+    checkOpenMindStatus();
   };
 
   // Check auth on mount (if not passed from AuthCallback)
@@ -43,7 +43,7 @@ export default function SetupPage() {
     if (location.state?.user) {
       setIsAuthenticated(true);
       setUser(location.state.user);
-      checkOpenClawStatus();
+      checkOpenMindStatus();
       return;
     }
     
@@ -56,7 +56,7 @@ export default function SetupPage() {
         const userData = await response.json();
         setUser(userData);
         setIsAuthenticated(true);
-        checkOpenClawStatus();
+        checkOpenMindStatus();
       } catch (e) {
         setIsAuthenticated(false);
         navigate('/login', { replace: true });
@@ -71,10 +71,10 @@ export default function SetupPage() {
     }
   }, [navigate, location.state]);
 
-  const checkOpenClawStatus = async () => {
+  const checkOpenMindStatus = async () => {
     setCheckingStatus(true);
     try {
-      const res = await fetch(`${API}/openclaw/status`, {
+      const res = await fetch(`${API}/openmind/status`, {
         credentials: 'include'
       });
       if (res.ok) {
@@ -103,14 +103,14 @@ export default function SetupPage() {
   const goToControlUI = async () => {
     try {
       // Fetch the token to pass to the Control UI
-      const res = await fetch(`${API}/openclaw/token`, {
+      const res = await fetch(`${API}/openmind/token`, {
         credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const gatewayWsUrl = `${wsProtocol}//${window.location.host}/api/openclaw/ws`;
-        window.location.href = `${API}/openclaw/ui/?gatewayUrl=${encodeURIComponent(gatewayWsUrl)}&token=${encodeURIComponent(data.token)}`;
+        const gatewayWsUrl = `${wsProtocol}//${window.location.host}/api/openmind/ws`;
+        window.location.href = `${API}/openmind/ui/?gatewayUrl=${encodeURIComponent(gatewayWsUrl)}&token=${encodeURIComponent(data.token)}`;
       } else {
         toast.error('Unable to get access token');
       }
@@ -131,9 +131,9 @@ export default function SetupPage() {
     navigate('/login', { replace: true });
   };
 
-  const handleStopOpenClaw = async () => {
+  const handleStopOpenMind = async () => {
     try {
-      const res = await fetch(`${API}/openclaw/stop`, {
+      const res = await fetch(`${API}/openmind/stop`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -180,7 +180,7 @@ export default function SetupPage() {
         payload.apiKey = apiKey;
       }
 
-      const res = await fetch(`${API}/openclaw/start`, {
+      const res = await fetch(`${API}/openmind/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -201,7 +201,7 @@ export default function SetupPage() {
       // Build the Control UI URL with token for authentication
       // The Control UI accepts token as a query parameter which it stores in localStorage
       const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const gatewayWsUrl = `${wsProtocol}//${window.location.host}/api/openclaw/ws`;
+      const gatewayWsUrl = `${wsProtocol}//${window.location.host}/api/openmind/ws`;
       const controlUrl = `${data.controlUrl}?gatewayUrl=${encodeURIComponent(gatewayWsUrl)}&token=${encodeURIComponent(data.token)}`;
       
       // Small delay before redirect
@@ -332,7 +332,7 @@ export default function SetupPage() {
 
       {/* Main Content */}
       <main className="relative z-10 container mx-auto px-4 sm:px-6 pb-16">
-        {/* If OpenClaw is running by another user */}
+        {/* If OpenMind is running by another user */}
         {status?.running && !status?.is_owner && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -381,7 +381,7 @@ export default function SetupPage() {
                     <ExternalLink className="w-4 h-4 ml-2" />
                   </Button>
                   <Button
-                    onClick={handleStopOpenClaw}
+                    onClick={handleStopOpenMind}
                     variant="outline"
                     className="border-zinc-700 hover:bg-zinc-800 text-zinc-300"
                     data-testid="stop-openmind-button"
@@ -571,7 +571,7 @@ export default function SetupPage() {
           <p>
             OpenMind is an open-source personal AI assistant.{' '}
             <a 
-              href="https://github.com/openclaw/openmind" 
+              href="https://github.com/openmind/openmind" 
               target="_blank" 
               rel="noreferrer"
               className="text-zinc-500 hover:text-zinc-400 underline underline-offset-2"
