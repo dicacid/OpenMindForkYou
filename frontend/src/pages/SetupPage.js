@@ -437,11 +437,17 @@ export default function SetupPage() {
                       <SelectItem value="emergent" className="focus:bg-[#1f2022]">
                         Emergent (Recommended - No key needed)
                       </SelectItem>
+                      <SelectItem value="openrouter" className="focus:bg-[#1f2022]">
+                        OpenRouter (ALL Models - One API Key)
+                      </SelectItem>
                       <SelectItem value="anthropic" className="focus:bg-[#1f2022]">
                         Anthropic (Claude) - Bring your own key
                       </SelectItem>
                       <SelectItem value="openai" className="focus:bg-[#1f2022]">
                         OpenAI (GPT) - Bring your own key
+                      </SelectItem>
+                      <SelectItem value="gemini" className="focus:bg-[#1f2022]">
+                        Google (Gemini) - Bring your own key
                       </SelectItem>
                     </SelectContent>
                   </Select>
