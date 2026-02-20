@@ -34,6 +34,7 @@ Build and rebrand the MoltBot/OpenClaw app into **OpenMind** with a polished UI,
 - Added env-driven base URLs for providers
 - Updated gateway env and supervisor program alignment
 - Manual verification: `/api/openmind/status` reachable; UI loads (private instance lock banner)
+- Pending verification: owner login + start flow end-to-end
 
 ## Known Issues
 - Start flow requires authenticated owner session; needs user verification after login (auth lock is active)
