@@ -502,7 +502,7 @@ def create_openmind_config(token: str = None, api_key: str = None, provider: str
     Args:
         token: Optional token. If not provided, reuses existing or generates new.
         api_key: Optional API key for provider.
-        provider: The LLM provider - "emergent", "openai", or "anthropic".
+        provider: The LLM provider - "emergent", "openai", "anthropic", "openrouter", or "gemini".
         force_new_token: If True, always generates a new token (triggers gateway restart).
 
     Returns:
