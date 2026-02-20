@@ -1255,6 +1255,94 @@ async def reset_soul(request: Request):
     return {"ok": True, "content": content}
 
 
+# ============== Skills Manager Endpoints ==============
+
+@api_router.get("/skills/installed")
+async def get_installed_skills(request: Request):
+    """Get all installed skills"""
+    user = await require_auth(request)
+    
+    skills = await db.installed_skills.find(
+        {"user_id": user.user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    return {"skills": skills}
+
+
+@api_router.post("/skills/install")
+async def install_skill(req: SkillInstallRequest, request: Request):
+    """Install a skill"""
+    user = await require_auth(request)
+    
+    # Check if already installed
+    existing = await db.installed_skills.find_one({
+        "user_id": user.user_id,
+        "skill_id": req.skill_id
+    })
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Skill already installed")
+    
+    # Create skill document
+    skill_doc = create_skill_document(req.skill_id)
+    skill_doc["user_id"] = user.user_id
+    
+    await db.installed_skills.insert_one(skill_doc)
+    
+    return {"ok": True, "message": "Skill installed successfully"}
+
+
+@api_router.post("/skills/uninstall")
+async def uninstall_skill(req: SkillInstallRequest, request: Request):
+    """Uninstall a skill"""
+    user = await require_auth(request)
+    
+    result = await db.installed_skills.delete_one({
+        "user_id": user.user_id,
+        "skill_id": req.skill_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    
+    return {"ok": True, "message": "Skill uninstalled"}
+
+
+@api_router.post("/skills/toggle")
+async def toggle_skill(req: SkillToggleRequest, request: Request):
+    """Enable or disable a skill"""
+    user = await require_auth(request)
+    
+    result = await db.installed_skills.update_one(
+        {"user_id": user.user_id, "skill_id": req.skill_id},
+        {"$set": {"enabled": req.enabled, "updated_at": datetime.now(timezone.utc)}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    
+    return {"ok": True, "message": "Skill updated"}
+
+
+@api_router.post("/skills/configure")
+async def configure_skill(req: SkillConfigureRequest, request: Request):
+    """Configure a skill"""
+    user = await require_auth(request)
+    
+    update_data = update_skill_config(req.skill_id, req.config)
+    
+    result = await db.installed_skills.update_one(
+        {"user_id": user.user_id, "skill_id": req.skill_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    
+    return {"ok": True, "message": "Configuration saved"}
+
+
 # ============== Legacy Status Endpoints ==============
 
 @api_router.post("/status", response_model=StatusCheck)
