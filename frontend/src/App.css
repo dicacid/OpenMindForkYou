@@ -9,13 +9,13 @@
   --mb-fg: #F2F3F5;
   --mb-muted: #9CA3AF;
   --mb-border: #1f2022;
-  --mb-accent: #FF4500;
-  --mb-accent-600: #E63E00;
-  --mb-accent-700: #CC3700;
+  --mb-accent: #8B5CF6;
+  --mb-accent-600: #7C3AED;
+  --mb-accent-700: #6D28D9;
   --mb-success: #22c55e;
   --mb-warning: #f59e0b;
   --mb-error: #ef4444;
-  --mb-ring: #FF4500;
+  --mb-ring: #8B5CF6;
   --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Fira Sans', ui-sans-serif, system-ui, sans-serif;
 }
@@ -49,7 +49,7 @@
   background: var(--mb-accent);
   color: #fff;
   border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(255, 69, 0, 0.18);
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.18);
   transition: background-color 0.15s ease-out;
 }
 
@@ -76,7 +76,7 @@ input:focus-visible,
 select:focus-visible,
 button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 69, 0, 0.15);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
 }
 
 /* Progress bar animation */
