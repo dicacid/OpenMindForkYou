@@ -32,6 +32,12 @@ export default function SetupPage() {
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('moltbot_onboarding_complete', 'true');
+    checkOpenClawStatus();
+  };
+
   // Check auth on mount (if not passed from AuthCallback)
   useEffect(() => {
     if (location.state?.user) {
@@ -41,12 +47,7 @@ export default function SetupPage() {
       return;
     }
     
-    const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-    checkOpenClawStatus();
-  };
-
-  const checkAuth = async () => {
+    const checkAuth = async () => {
       try {
         const response = await fetch(`${API}/auth/me`, {
           credentials: 'include'
