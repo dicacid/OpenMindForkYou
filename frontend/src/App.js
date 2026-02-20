@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import LoginPage from "@/pages/LoginPage";
@@ -7,7 +7,13 @@ import AuthCallback from "@/pages/AuthCallback";
 import MemoryManagerPage from "@/pages/MemoryManagerPage";
 import SkillsPage from "@/pages/SkillsPage";
 import HeartbeatSchedulerPage from "@/pages/HeartbeatSchedulerPage";
+import ChatPage from "@/pages/ChatPage";
+import SettingsPage from "@/pages/SettingsPage";
+import CommandPalette from "@/components/CommandPalette";
+import ActivityLog from "@/components/ActivityLog";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 
