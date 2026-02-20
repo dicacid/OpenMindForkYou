@@ -39,6 +39,14 @@ from memory_manager import (
 )
 # Skills management
 from skills_manager import create_skill_document, update_skill_config
+# Scheduler management
+from scheduler_manager import (
+    parse_cron_to_human,
+    get_next_run_time,
+    validate_cron,
+    create_job_document,
+    create_execution_log
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
