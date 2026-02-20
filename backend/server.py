@@ -1724,6 +1724,28 @@ async def send_chat_message(req: dict, request: Request):
     return {"response": response, "tool_calls": []}
 
 
+@api_router.get("/llm/models")
+async def get_available_models(provider: str = None):
+    """Get available models for a provider"""
+    from llm_integration import OpenMindLLM
+    
+    if provider:
+        models = OpenMindLLM.get_available_models(provider)
+        return {"provider": provider, "models": models}
+    
+    all_models = OpenMindLLM.get_available_models()
+    return {"providers": all_models}
+
+
+@api_router.get("/llm/providers")
+async def get_available_providers():
+    """Get all available LLM providers"""
+    from llm_integration import OpenMindLLM
+    
+    providers = OpenMindLLM.get_all_providers()
+    return {"providers": providers}
+
+
 # ============== Legacy Status Endpoints ==============
 
 @api_router.post("/status", response_model=StatusCheck)
