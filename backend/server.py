@@ -1367,6 +1367,197 @@ async def configure_skill(req: SkillConfigureRequest, request: Request):
     return {"ok": True, "message": "Configuration saved"}
 
 
+# ============== Heartbeat Scheduler Endpoints ==============
+
+@api_router.post("/scheduler/parse-cron")
+async def parse_cron(req: CronParseRequest):
+    """Parse cron expression to human-readable format"""
+    if not validate_cron(req.cron_expression):
+        return {"human_readable": "Invalid cron expression"}
+    
+    human_readable = parse_cron_to_human(req.cron_expression)
+    return {"human_readable": human_readable}
+
+
+@api_router.get("/scheduler/jobs")
+async def get_scheduler_jobs(request: Request):
+    """Get all scheduled jobs for the user"""
+    user = await require_auth(request)
+    
+    jobs = await db.scheduled_jobs.find(
+        {"user_id": user.user_id},
+        {"user_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Add human-readable schedule summary
+    for job in jobs:
+        job["schedule_summary"] = parse_cron_to_human(job["cron_expression"])
+        # Convert ObjectId to string
+        job["_id"] = str(job["_id"])
+    
+    return {"jobs": jobs}
+
+
+@api_router.post("/scheduler/jobs")
+async def create_scheduler_job(req: JobCreateRequest, request: Request):
+    """Create a new scheduled job"""
+    user = await require_auth(request)
+    
+    if not validate_cron(req.cron_expression):
+        raise HTTPException(status_code=400, detail="Invalid cron expression")
+    
+    job_doc = create_job_document(
+        req.name,
+        req.cron_expression,
+        req.prompt,
+        req.delivery_channel,
+        req.active
+    )
+    job_doc["user_id"] = user.user_id
+    
+    result = await db.scheduled_jobs.insert_one(job_doc)
+    
+    return {"ok": True, "job_id": str(result.inserted_id)}
+
+
+@api_router.put("/scheduler/jobs/{job_id}")
+async def update_scheduler_job(job_id: str, req: JobCreateRequest, request: Request):
+    """Update a scheduled job"""
+    user = await require_auth(request)
+    
+    if not validate_cron(req.cron_expression):
+        raise HTTPException(status_code=400, detail="Invalid cron expression")
+    
+    from bson import ObjectId
+    
+    update_data = {
+        "name": req.name,
+        "cron_expression": req.cron_expression,
+        "prompt": req.prompt,
+        "delivery_channel": req.delivery_channel,
+        "active": req.active,
+        "updated_at": datetime.now(timezone.utc),
+        "next_run_at": get_next_run_time(req.cron_expression)
+    }
+    
+    result = await db.scheduled_jobs.update_one(
+        {"_id": ObjectId(job_id), "user_id": user.user_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    return {"ok": True}
+
+
+@api_router.delete("/scheduler/jobs/{job_id}")
+async def delete_scheduler_job(job_id: str, request: Request):
+    """Delete a scheduled job"""
+    user = await require_auth(request)
+    
+    from bson import ObjectId
+    
+    result = await db.scheduled_jobs.delete_one({
+        "_id": ObjectId(job_id),
+        "user_id": user.user_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    return {"ok": True}
+
+
+@api_router.post("/scheduler/jobs/{job_id}/toggle")
+async def toggle_scheduler_job(job_id: str, req: JobToggleRequest, request: Request):
+    """Enable or disable a scheduled job"""
+    user = await require_auth(request)
+    
+    from bson import ObjectId
+    
+    result = await db.scheduled_jobs.update_one(
+        {"_id": ObjectId(job_id), "user_id": user.user_id},
+        {"$set": {"active": req.active, "updated_at": datetime.now(timezone.utc)}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    return {"ok": True}
+
+
+@api_router.post("/scheduler/jobs/{job_id}/run")
+async def run_scheduler_job(job_id: str, request: Request):
+    """Run a job immediately (simulate execution)"""
+    user = await require_auth(request)
+    
+    from bson import ObjectId
+    
+    job = await db.scheduled_jobs.find_one({
+        "_id": ObjectId(job_id),
+        "user_id": user.user_id
+    })
+    
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Simulate job execution
+    import random
+    status = "success" if random.random() > 0.1 else "failed"
+    
+    # Generate mock output
+    if status == "success":
+        output = f"Job '{job['name']}' executed successfully.\\n\\nPrompt: {job['prompt']}\\n\\nResult: Task completed and sent to {job['delivery_channel']}."
+    else:
+        output = f"Job '{job['name']}' failed to execute.\\n\\nError: Connection timeout to {job['delivery_channel']} service."
+    
+    # Create execution log
+    log_doc = create_execution_log(
+        str(job["_id"]),
+        job["name"],
+        status,
+        output
+    )
+    log_doc["user_id"] = user.user_id
+    
+    await db.job_execution_logs.insert_one(log_doc)
+    
+    # Update job's last run info
+    await db.scheduled_jobs.update_one(
+        {"_id": ObjectId(job_id)},
+        {
+            "$set": {
+                "last_run_at": datetime.now(timezone.utc),
+                "last_run_status": status,
+                "next_run_at": get_next_run_time(job["cron_expression"])
+            }
+        }
+    )
+    
+    return {
+        "ok": True,
+        "result": {
+            "status": status,
+            "output": output,
+            "executed_at": datetime.now(timezone.utc).isoformat()
+        }
+    }
+
+
+@api_router.get("/scheduler/history")
+async def get_scheduler_history(request: Request):
+    """Get execution history for all jobs"""
+    user = await require_auth(request)
+    
+    history = await db.job_execution_logs.find(
+        {"user_id": user.user_id},
+        {"_id": 0, "user_id": 0, "job_id": 0}
+    ).sort("executed_at", -1).limit(50).to_list(50)
+    
+    return {"history": history}
+
+
 # ============== Legacy Status Endpoints ==============
 
 @api_router.post("/status", response_model=StatusCheck)
