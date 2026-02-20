@@ -881,8 +881,8 @@ async def start_openmind(request: OpenMindStartRequest, req: Request):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to start OpenMind: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Failed to start OpenMind: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Startup failed: {str(e)}")
 
 
 @api_router.get("/openmind/status", response_model=OpenMindStatusResponse)
