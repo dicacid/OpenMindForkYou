@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-route
 import LoginPage from "@/pages/LoginPage";
 import SetupPage from "@/pages/SetupPage";
 import AuthCallback from "@/pages/AuthCallback";
+import MemoryManagerPage from "@/pages/MemoryManagerPage";
 import { Toaster } from "@/components/ui/sonner";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
