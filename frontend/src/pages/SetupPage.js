@@ -456,6 +456,11 @@ export default function SetupPage() {
                       Pre-configured with Claude Opus 4.5 and GPT-5.2 - no API key needed
                     </p>
                   )}
+                  {provider === 'openrouter' && (
+                    <p className="text-xs text-violet-400">
+                      Access to 200+ models including GPT-4, Claude, Gemini, Llama, and more!
+                    </p>
+                  )}
                 </div>
 
                 {/* API Key Input - Only show for non-emergent providers */}
