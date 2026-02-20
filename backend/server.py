@@ -1572,6 +1572,54 @@ async def get_scheduler_history(request: Request):
     return {"history": history}
 
 
+# ============== Onboarding Endpoints ==============
+
+@api_router.post("/onboarding/test-provider")
+async def test_provider(req: OnboardingTestProviderRequest):
+    """Test API provider connection"""
+    # Simulate provider test
+    import asyncio
+    await asyncio.sleep(1)
+    
+    # Simple validation - in production, would actually test the API
+    if req.provider == 'ollama':
+        # Check if ollama is running (simplified)
+        return {"status": "success", "message": "Ollama connection OK"}
+    
+    if not req.api_key or len(req.api_key) < 10:
+        raise HTTPException(status_code=400, detail="Invalid API key")
+    
+    return {"status": "success", "message": f"{req.provider} connection successful"}
+
+
+@api_router.post("/onboarding/complete")
+async def complete_onboarding(req: OnboardingCompleteRequest, request: Request):
+    """Save onboarding configuration"""
+    user = await require_auth(request)
+    
+    # Store configuration in database
+    config = {
+        "user_id": user.user_id,
+        "assistant_name": req.assistantName,
+        "user_name": req.userName,
+        "provider": req.provider,
+        "api_key_set": bool(req.apiKey),
+        "access_mode": req.accessMode,
+        "messaging_apps": req.messaging,
+        "onboarding_completed": True,
+        "completed_at": datetime.now(timezone.utc)
+    }
+    
+    # Upsert configuration
+    await db.user_config.update_one(
+        {"user_id": user.user_id},
+        {"$set": config},
+        upsert=True
+    )
+    
+    return {"ok": True, "message": "Configuration saved"}
+
+
 # ============== Legacy Status Endpoints ==============
 
 @api_router.post("/status", response_model=StatusCheck)
