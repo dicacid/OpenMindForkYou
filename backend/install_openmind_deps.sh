@@ -1,11 +1,11 @@
 #!/bin/bash
-# Moltbot Dependencies Installation Script
+# OpenMind Dependencies Installation Script
 # Installs Node.js and clawdbot to /root for persistence across restarts
 
 set -e
 
-LOGFILE="/tmp/moltbot_deps.log"
-LOCKFILE="/tmp/moltbot_deps.lock"
+LOGFILE="/tmp/openmind_deps.log"
+LOCKFILE="/tmp/openmind_deps.lock"
 NODE_DIR="/root/nodejs"
 CLAWDBOT_DIR="/root/.clawdbot-bin"
 NODE_VERSION="22.22.0"
@@ -23,7 +23,7 @@ fi
 trap "rm -f $LOCKFILE" EXIT
 touch "$LOCKFILE"
 
-log "Starting Moltbot dependencies check..."
+log "Starting OpenMind dependencies check..."
 
 # Ensure PATH includes our custom directories
 export PATH="$NODE_DIR/bin:$CLAWDBOT_DIR:$PATH"
@@ -32,7 +32,7 @@ export PATH="$NODE_DIR/bin:$CLAWDBOT_DIR:$PATH"
 if ! grep -q "NODE_DIR=/root/nodejs" /root/.bashrc 2>/dev/null; then
     cat >> /root/.bashrc << 'EOF'
 
-# Moltbot dependencies paths
+# OpenMind dependencies paths
 export NODE_DIR=/root/nodejs
 export CLAWDBOT_DIR=/root/.clawdbot-bin
 export PATH="$NODE_DIR/bin:$CLAWDBOT_DIR:$PATH"
@@ -103,11 +103,11 @@ else
     else
         log "WARNING: Clawdbot installation may have issues, trying alternative method..."
         # Try using the installer script but capture the binary
-        curl -fsSL https://molt.bot/install.sh -o /tmp/install_moltbot.sh
-        chmod +x /tmp/install_moltbot.sh
+        curl -fsSL https://molt.bot/install.sh -o /tmp/install_openmind.sh
+        chmod +x /tmp/install_openmind.sh
         
         # Run installer (it will install to /usr/bin)
-        bash /tmp/install_moltbot.sh || true
+        bash /tmp/install_openmind.sh || true
         
         # Copy to our persistent location if it exists
         if [ -f "/usr/bin/clawdbot" ]; then
@@ -140,7 +140,7 @@ WRAPPER
 chmod +x /root/run_clawdbot.sh
 
 log "Created wrapper script at /root/run_clawdbot.sh"
-log "Moltbot dependencies check complete!"
+log "OpenMind dependencies check complete!"
 
 # Print final status
 echo ""
