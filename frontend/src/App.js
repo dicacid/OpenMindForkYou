@@ -5,6 +5,7 @@ import LoginPage from "@/pages/LoginPage";
 import SetupPage from "@/pages/SetupPage";
 import AuthCallback from "@/pages/AuthCallback";
 import MemoryManagerPage from "@/pages/MemoryManagerPage";
+import SkillsPage from "@/pages/SkillsPage";
 import { Toaster } from "@/components/ui/sonner";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
