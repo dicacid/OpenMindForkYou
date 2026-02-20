@@ -67,7 +67,7 @@ MOLTBOT_PORT = 18789
 MOLTBOT_CONTROL_PORT = 18791
 CONFIG_DIR = os.path.expanduser("~/.openmind")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "openmind.json")
-WORKSPACE_DIR = os.path.expanduser("~/clawd")
+WORKSPACE_DIR = os.path.expanduser("~/openmind-workspace")
 
 # Global state for gateway (per-user)
 # Note: Process is managed by supervisor, we only track metadata here
@@ -99,19 +99,19 @@ class StatusCheckCreate(BaseModel):
     client_name: str
 
 
-class OpenClawStartRequest(BaseModel):
+class OpenMindStartRequest(BaseModel):
     provider: str = "emergent"  # "emergent", "anthropic", or "openai"
     apiKey: Optional[str] = None  # Optional - uses Emergent key if not provided
 
 
-class OpenClawStartResponse(BaseModel):
+class OpenMindStartResponse(BaseModel):
     ok: bool
     controlUrl: str
     token: str
     message: str
 
 
-class OpenClawStatusResponse(BaseModel):
+class OpenMindStatusResponse(BaseModel):
     running: bool
     pid: Optional[int] = None
     provider: Optional[str] = None
@@ -772,7 +772,7 @@ async def start_gateway_process(api_key: str, provider: str, owner_user_id: str)
     openmind_cmd = get_openmind_command()
     if not openmind_cmd:
         if not ensure_moltbot_installed():
-            raise HTTPException(status_code=500, detail="OpenClaw (openmind) is not installed. Please contact support.")
+            raise HTTPException(status_code=500, detail="OpenMind (openmind) is not installed. Please contact support.")
         openmind_cmd = get_openmind_command()
         if not openmind_cmd:
             raise HTTPException(status_code=500, detail="Failed to find openmind after installation")
@@ -843,11 +843,11 @@ def check_gateway_running():
 
 @api_router.get("/")
 async def root():
-    return {"message": "OpenClaw Hosting API"}
+    return {"message": "OpenMind Hosting API"}
 
 
-@api_router.post("/openclaw/start", response_model=OpenClawStartResponse)
-async def start_moltbot(request: OpenClawStartRequest, req: Request):
+@api_router.post("/openmind/start", response_model=OpenMindStartResponse)
+async def start_moltbot(request: OpenMindStartRequest, req: Request):
     """Start the Moltbot gateway with Emergent provider (requires auth)"""
     user = await require_auth(req)
 
@@ -862,7 +862,7 @@ async def start_moltbot(request: OpenClawStartRequest, req: Request):
     if check_gateway_running() and gateway_state["owner_user_id"] != user.user_id:
         raise HTTPException(
             status_code=403,
-            detail="OpenClaw is already running by another user. Please wait for them to stop it."
+            detail="OpenMind is already running by another user. Please wait for them to stop it."
         )
 
     try:
@@ -872,11 +872,11 @@ async def start_moltbot(request: OpenClawStartRequest, req: Request):
         await set_instance_owner(user)
         logger.info(f"Instance locked to user: {user.email}")
 
-        return OpenClawStartResponse(
+        return OpenMindStartResponse(
             ok=True,
-            controlUrl="/api/openclaw/ui/",
+            controlUrl="/api/openmind/ui/",
             token=token,
-            message="OpenClaw started successfully with Emergent provider"
+            message="OpenMind started successfully with Emergent provider"
         )
     except HTTPException:
         raise
@@ -885,7 +885,7 @@ async def start_moltbot(request: OpenClawStartRequest, req: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@api_router.get("/openclaw/status", response_model=OpenClawStatusResponse)
+@api_router.get("/openmind/status", response_model=OpenMindStatusResponse)
 async def get_moltbot_status(request: Request):
     """Get the current status of the Moltbot gateway"""
     user = await get_current_user(request)
@@ -893,26 +893,26 @@ async def get_moltbot_status(request: Request):
 
     if running:
         is_owner = user and gateway_state["owner_user_id"] == user.user_id
-        return OpenClawStatusResponse(
+        return OpenMindStatusResponse(
             running=True,
             pid=SupervisorClient.get_pid(),
             provider=gateway_state["provider"],
             started_at=gateway_state["started_at"],
-            controlUrl="/api/openclaw/ui/",
+            controlUrl="/api/openmind/ui/",
             owner_user_id=gateway_state["owner_user_id"],
             is_owner=is_owner
         )
     else:
-        return OpenClawStatusResponse(running=False)
+        return OpenMindStatusResponse(running=False)
 
 
-@api_router.get("/openclaw/whatsapp/status")
+@api_router.get("/openmind/whatsapp/status")
 async def get_whatsapp_connection_status():
     """Get basic WhatsApp connection status. Auto-fix handled by background watcher."""
     return get_whatsapp_status()
 
 
-@api_router.post("/openclaw/stop")
+@api_router.post("/openmind/stop")
 async def stop_moltbot(request: Request):
     """Stop the Moltbot gateway (only owner can stop)"""
     user = await require_auth(request)
@@ -925,11 +925,11 @@ async def stop_moltbot(request: Request):
             {"_id": "gateway_config"},
             {"$set": {"should_run": False, "updated_at": datetime.now(timezone.utc)}}
         )
-        return {"ok": True, "message": "OpenClaw is not running"}
+        return {"ok": True, "message": "OpenMind is not running"}
 
     # Check if user is the owner
     if gateway_state["owner_user_id"] != user.user_id:
-        raise HTTPException(status_code=403, detail="Only the owner can stop OpenClaw")
+        raise HTTPException(status_code=403, detail="Only the owner can stop OpenMind")
 
     # Stop via supervisor
     if not SupervisorClient.stop():
@@ -950,16 +950,16 @@ async def stop_moltbot(request: Request):
     gateway_state["started_at"] = None
     gateway_state["owner_user_id"] = None
 
-    return {"ok": True, "message": "OpenClaw stopped"}
+    return {"ok": True, "message": "OpenMind stopped"}
 
 
-@api_router.get("/openclaw/token")
+@api_router.get("/openmind/token")
 async def get_moltbot_token(request: Request):
     """Get the current gateway token for authentication (only owner)"""
     user = await require_auth(request)
 
     if not check_gateway_running():
-        raise HTTPException(status_code=404, detail="OpenClaw not running")
+        raise HTTPException(status_code=404, detail="OpenMind not running")
 
     # Only owner can get the token
     if gateway_state["owner_user_id"] != user.user_id:
@@ -970,21 +970,21 @@ async def get_moltbot_token(request: Request):
 
 # ============== Moltbot Proxy (Protected) ==============
 
-@api_router.api_route("/openclaw/ui/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
+@api_router.api_route("/openmind/ui/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
 async def proxy_moltbot_ui(request: Request, path: str = ""):
     """Proxy requests to the Moltbot Control UI (only owner can access)"""
     user = await get_current_user(request)
 
     if not check_gateway_running():
         return HTMLResponse(
-            content="<html><body><h1>OpenClaw not running</h1><p>Please start OpenClaw first.</p><a href='/'>Go to setup</a></body></html>",
+            content="<html><body><h1>OpenMind not running</h1><p>Please start OpenMind first.</p><a href='/'>Go to setup</a></body></html>",
             status_code=503
         )
 
     # Check if user is the owner
     if not user or gateway_state["owner_user_id"] != user.user_id:
         return HTMLResponse(
-            content="<html><body><h1>Access Denied</h1><p>This OpenClaw instance is owned by another user.</p><a href='/'>Go back</a></body></html>",
+            content="<html><body><h1>Access Denied</h1><p>This OpenMind instance is owned by another user.</p><a href='/'>Go back</a></body></html>",
             status_code=403
         )
 
@@ -1031,9 +1031,9 @@ async def proxy_moltbot_ui(request: Request, path: str = ""):
                 # Inject WebSocket URL override script with token
                 ws_override = f'''
 <script>
-// OpenClaw Proxy Configuration
+// OpenMind Proxy Configuration
 window.__MOLTBOT_PROXY_TOKEN__ = "{current_token}";
-window.__MOLTBOT_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/openclaw/ws';
+window.__MOLTBOT_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/openmind/ws';
 
 // Override WebSocket to use proxy path
 (function() {{
@@ -1043,11 +1043,11 @@ window.__MOLTBOT_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:
     window.WebSocket = function(url, protocols) {{
         let finalUrl = url;
 
-        // Rewrite any OpenClaw gateway URLs to use our proxy
+        // Rewrite any OpenMind gateway URLs to use our proxy
         if (url.includes('127.0.0.1:18789') ||
             url.includes('localhost:18789') ||
             url.includes('0.0.0.0:18789') ||
-            (url.includes(':18789') && !url.includes('/api/openclaw/'))) {{
+            (url.includes(':18789') && !url.includes('/api/openmind/'))) {{
             finalUrl = proxyWsUrl;
         }}
 
@@ -1059,7 +1059,7 @@ window.__MOLTBOT_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:
             }}
         }} catch (e) {{}}
 
-        console.log('[OpenClaw Proxy] WebSocket:', url, '->', finalUrl);
+        console.log('[OpenMind Proxy] WebSocket:', url, '->', finalUrl);
         return new originalWS(finalUrl, protocols);
     }};
 
@@ -1089,27 +1089,27 @@ window.__MOLTBOT_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:
             )
         except httpx.RequestError as e:
             logger.error(f"Proxy error: {e}")
-            raise HTTPException(status_code=502, detail="Failed to connect to OpenClaw")
+            raise HTTPException(status_code=502, detail="Failed to connect to OpenMind")
 
 
 # Root proxy for Moltbot UI (handles /api/moltbot/ui without trailing path)
-@api_router.get("/openclaw/ui")
+@api_router.get("/openmind/ui")
 async def proxy_moltbot_ui_root(request: Request):
     """Redirect to Moltbot UI with trailing slash"""
     return Response(
         status_code=307,
-        headers={"Location": "/api/openclaw/ui/"}
+        headers={"Location": "/api/openmind/ui/"}
     )
 
 
 # WebSocket proxy for Moltbot (Protected)
-@api_router.websocket("/openclaw/ws")
+@api_router.websocket("/openmind/ws")
 async def websocket_proxy(websocket: WebSocket):
     """WebSocket proxy for Moltbot Control UI"""
     await websocket.accept()
 
     if not check_gateway_running():
-        await websocket.close(code=1013, reason="OpenClaw not running")
+        await websocket.close(code=1013, reason="OpenMind not running")
         return
 
     # Note: WebSocket auth is handled by the token in the connection itself
