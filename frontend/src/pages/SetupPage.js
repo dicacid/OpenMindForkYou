@@ -67,7 +67,7 @@ export default function SetupPage() {
         const data = await res.json();
         setStatus(data);
         if (data.running && data.is_owner) {
-          toast.success('OpenClaw is already running!');
+          toast.success('MoltBot is already running!');
         }
       }
     } catch (e) {
@@ -80,7 +80,7 @@ export default function SetupPage() {
   const stageText = useMemo(() => {
     if (progress < 10) return 'Waiting to start';
     if (progress < 30) return 'Validating configuration...';
-    if (progress < 60) return 'Starting OpenClaw services...';
+    if (progress < 60) return 'Starting MoltBot services...';
     if (progress < 85) return 'Initializing Control UI...';
     if (progress < 95) return 'Almost ready...';
     return 'Redirecting to Control UI';
@@ -125,13 +125,13 @@ export default function SetupPage() {
       });
       if (res.ok) {
         setStatus(null);
-        toast.success('OpenClaw stopped');
+        toast.success('MoltBot stopped');
       } else {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.detail || 'Failed to stop OpenClaw');
+        toast.error(data.detail || 'Failed to stop MoltBot');
       }
     } catch (e) {
-      toast.error('Failed to stop OpenClaw');
+      toast.error('Failed to stop MoltBot');
     }
   };
 
@@ -182,7 +182,7 @@ export default function SetupPage() {
 
       const data = await res.json();
       setProgress(95);
-      toast.success('OpenClaw started successfully!');
+      toast.success('MoltBot started successfully!');
       
       // Build the Control UI URL with token for authentication
       // The Control UI accepts token as a query parameter which it stores in localStorage
@@ -198,7 +198,7 @@ export default function SetupPage() {
 
     } catch (e) {
       console.error(e);
-      setError(e.message || 'Unable to start OpenClaw');
+      setError(e.message || 'Unable to start MoltBot');
       toast.error('Startup error: ' + (e.message || 'Unknown error'));
       setLoading(false);
       setProgress(0);
@@ -210,7 +210,7 @@ export default function SetupPage() {
       <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center">
         <div className="text-zinc-400 flex items-center gap-2">
           <Loader2 className="w-5 h-5 animate-spin" />
-          {isAuthenticated === null ? 'Checking authentication...' : 'Checking OpenClaw status...'}
+          {isAuthenticated === null ? 'Checking authentication...' : 'Checking MoltBot status...'}
         </div>
       </div>
     );
