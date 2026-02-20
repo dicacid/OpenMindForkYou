@@ -72,7 +72,7 @@ export default function LoginPage() {
         <Card className="border-[#1f2022] bg-[#141416]/95 backdrop-blur-sm">
           <CardHeader className="text-center space-y-4">
             <div className="flex items-center justify-center gap-3">
-              <OpenClaw size={48} />
+              <OpenMind size={48} />
             </div>
             <CardTitle className="heading text-2xl font-semibold">
               OpenMind Setup
