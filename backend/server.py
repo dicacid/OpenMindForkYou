@@ -177,6 +177,20 @@ class JobToggleRequest(BaseModel):
     active: bool
 
 
+class OnboardingTestProviderRequest(BaseModel):
+    provider: str
+    api_key: str = None
+
+
+class OnboardingCompleteRequest(BaseModel):
+    assistantName: str
+    userName: str
+    provider: str
+    apiKey: str = None
+    accessMode: str
+    messaging: list = []
+
+
 # ============== Authentication Helpers ==============
 
 EMERGENT_AUTH_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
