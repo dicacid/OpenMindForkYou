@@ -238,3 +238,98 @@ code {
     margin: 2rem 0;
 }
 
+/* Light Mode Styles */
+.light {
+    --background: 255 255 255;
+    --foreground: 10 10 10;
+}
+
+.light .bg-\[\#0f0f10\] {
+    background-color: #fafafa !important;
+}
+
+.light .bg-\[\#141416\] {
+    background-color: #ffffff !important;
+}
+
+.light .text-zinc-100 {
+    color: #18181b !important;
+}
+
+.light .text-zinc-300 {
+    color: #3f3f46 !important;
+}
+
+.light .text-zinc-400 {
+    color: #52525b !important;
+}
+
+.light .text-zinc-500 {
+    color: #71717a !important;
+}
+
+.light .border-\[\#1f2022\] {
+    border-color: #e4e4e7 !important;
+}
+
+.light .border-\[\#2f3032\] {
+    border-color: #d4d4d8 !important;
+}
+
+/* Responsive Mobile Support */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .heading {
+        font-size: 1.25rem;
+    }
+
+    .grid-cols-2,
+    .grid-cols-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md\:grid-cols-2 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .lg\:grid-cols-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .hidden.sm\:inline {
+        display: none;
+    }
+
+    .max-w-4xl {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .text-4xl {
+        font-size: 2rem;
+    }
+
+    .text-3xl {
+        font-size: 1.5rem;
+    }
+
+    .text-2xl {
+        font-size: 1.25rem;
+    }
+
+    .px-8 {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .py-6 {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
