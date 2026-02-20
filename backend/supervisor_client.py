@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class SupervisorClient:
     """Client for interacting with supervisord to manage the gateway process."""
 
-    PROGRAM = "openmind-gateway"
+    PROGRAM = "clawdbot-gateway"
 
     @classmethod
     def start(cls) -> bool:
