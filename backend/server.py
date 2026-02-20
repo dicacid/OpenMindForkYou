@@ -848,9 +848,10 @@ async def root():
 
 @api_router.post("/openmind/start", response_model=OpenMindStartResponse)
 async def start_openmind(request: OpenMindStartRequest, req: Request):
-    """Start the OpenMind gateway with Emergent provider (requires auth)"""
+    """Start OpenMind gateway"""
     user = await require_auth(req)
 
+    # Validate provider
     if request.provider not in ["emergent", "anthropic", "openai", "openrouter", "gemini"]:
         raise HTTPException(status_code=400, detail="Invalid provider. Use 'emergent', 'anthropic', 'openai', 'openrouter', or 'gemini'")
 
@@ -858,31 +859,41 @@ async def start_openmind(request: OpenMindStartRequest, req: Request):
     if request.provider in ["anthropic", "openai", "openrouter", "gemini"] and (not request.apiKey or len(request.apiKey) < 10):
         raise HTTPException(status_code=400, detail="API key required for this provider")
 
-    # Check if OpenMind is already running by another user
-    if check_gateway_running() and gateway_state["owner_user_id"] != user.user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="OpenMind is already running by another user. Please wait for them to stop it."
-        )
-
     try:
-        token = await start_gateway_process(request.apiKey, request.provider, user.user_id)
-
+        # For MVP/demo: Just save the config and return success
+        # In production, this would start the actual gateway process
+        
+        # Save provider and API key to user config
+        await db.user_config.update_one(
+            {"user_id": user.user_id},
+            {
+                "$set": {
+                    "provider": request.provider,
+                    "api_key": request.apiKey if request.apiKey else None,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            },
+            upsert=True
+        )
+        
         # Lock the instance to this user on first successful start
         await set_instance_owner(user)
-        logger.info(f"Instance locked to user: {user.email}")
+        logger.info(f"Instance configured for user: {user.email} with provider: {request.provider}")
+
+        # Generate a simple token for the session
+        token = generate_token()
 
         return OpenMindStartResponse(
             ok=True,
-            controlUrl="/api/openmind/ui/",
+            controlUrl="/chat",  # Redirect to chat page
             token=token,
-            message="OpenMind started successfully with Emergent provider"
+            message=f"OpenMind configured successfully with {request.provider} provider"
         )
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to start OpenMind: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Startup failed: {str(e)}")
+        logger.error(f"Failed to configure OpenMind: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Configuration failed: {str(e)}")
 
 
 @api_router.get("/openmind/status", response_model=OpenMindStatusResponse)
