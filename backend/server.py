@@ -1620,6 +1620,93 @@ async def complete_onboarding(req: OnboardingCompleteRequest, request: Request):
     return {"ok": True, "message": "Configuration saved"}
 
 
+# ============== Settings Endpoints ==============
+
+@api_router.get("/settings/config")
+async def get_settings_config(request: Request):
+    """Get user settings"""
+    user = await require_auth(request)
+    
+    config = await db.user_config.find_one(
+        {"user_id": user.user_id},
+        {"_id": 0, "user_id": 0}
+    )
+    
+    return {"config": config or {}}
+
+
+@api_router.post("/settings/config")
+async def save_settings_config(req: dict, request: Request):
+    """Save user settings"""
+    user = await require_auth(request)
+    
+    await db.user_config.update_one(
+        {"user_id": user.user_id},
+        {"$set": {**req, "updated_at": datetime.now(timezone.utc)}},
+        upsert=True
+    )
+    
+    return {"ok": True}
+
+
+# ============== Audit Log Endpoints ==============
+
+@api_router.get("/audit/logs")
+async def get_audit_logs(request: Request):
+    """Get audit logs"""
+    user = await require_auth(request)
+    
+    logs = await db.audit_logs.find(
+        {"user_id": user.user_id},
+        {"_id": 0, "user_id": 0}
+    ).sort("timestamp", -1).limit(100).to_list(100)
+    
+    return {"logs": logs}
+
+
+# ============== Activity Endpoints ==============
+
+@api_router.get("/activity/last")
+async def get_last_activity(request: Request):
+    """Get last activity"""
+    user = await require_auth(request)
+    
+    activity = await db.audit_logs.find_one(
+        {"user_id": user.user_id},
+        {"_id": 0},
+        sort=[("timestamp", -1)]
+    )
+    
+    return {"activity": activity}
+
+
+# ============== Chat Endpoints ==============
+
+@api_router.post("/chat/message")
+async def send_chat_message(req: dict, request: Request):
+    """Send chat message"""
+    user = await require_auth(request)
+    
+    message = req.get("message", "")
+    session_id = req.get("session_id", "default")
+    
+    # Simulate response (in production, call actual LLM)
+    response = f"I received your message: {message}. This is a simulated response."
+    
+    # Log to audit
+    await db.audit_logs.insert_one({
+        "user_id": user.user_id,
+        "session_id": session_id,
+        "tool_name": "chat",
+        "arguments": {"message": message},
+        "result": {"response": response},
+        "timestamp": datetime.now(timezone.utc),
+        "assistant_name": "Mind"
+    })
+    
+    return {"response": response, "tool_calls": []}
+
+
 # ============== Legacy Status Endpoints ==============
 
 @api_router.post("/status", response_model=StatusCheck)
