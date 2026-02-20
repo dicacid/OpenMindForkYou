@@ -246,6 +246,16 @@ export default function SetupPage() {
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => navigate('/skills')}
+              data-testid="skills-button"
+              className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
+            >
+              <Package className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Skills</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate('/memory')}
               data-testid="memory-manager-button"
               className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
