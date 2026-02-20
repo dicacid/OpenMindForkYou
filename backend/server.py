@@ -139,6 +139,20 @@ class MemoryClearSectionRequest(BaseModel):
     section_type: str  # "fact", "preference", "project"
 
 
+class SkillInstallRequest(BaseModel):
+    skill_id: str
+
+
+class SkillConfigureRequest(BaseModel):
+    skill_id: str
+    config: dict
+
+
+class SkillToggleRequest(BaseModel):
+    skill_id: str
+    enabled: bool
+
+
 # ============== Authentication Helpers ==============
 
 EMERGENT_AUTH_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
