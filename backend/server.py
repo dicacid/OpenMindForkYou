@@ -62,9 +62,9 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Moltbot Gateway Management
-MOLTBOT_PORT = 18789
-MOLTBOT_CONTROL_PORT = 18791
+# OpenMind Gateway Management
+OPENMIND_PORT = 18789
+OPENMIND_CONTROL_PORT = 18791
 CONFIG_DIR = os.path.expanduser("~/.openmind")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "openmind.json")
 WORKSPACE_DIR = os.path.expanduser("~/openmind-workspace")
@@ -431,7 +431,7 @@ async def logout(request: Request, response: Response):
     return {"ok": True, "message": "Logged out"}
 
 
-# ============== Moltbot Helpers ==============
+# ============== OpenMind Helpers ==============
 
 # Persistent paths for Node.js and openmind
 NODE_DIR = "/root/nodejs"
@@ -456,9 +456,9 @@ def get_openmind_command():
     return None
 
 
-def ensure_moltbot_installed():
-    """Ensure Moltbot dependencies are installed"""
-    install_script = "/app/backend/install_moltbot_deps.sh"
+def ensure_openmind_installed():
+    """Ensure OpenMind dependencies are installed"""
+    install_script = "/app/backend/install_openmind_deps.sh"
 
     # Check if openmind is available
     openmind_cmd = get_openmind_command()
@@ -477,7 +477,7 @@ def ensure_moltbot_installed():
                 timeout=300
             )
             if result.returncode == 0:
-                logger.info("Moltbot dependencies installed successfully")
+                logger.info("OpenMind dependencies installed successfully")
                 return True
             else:
                 logger.error(f"Installation failed: {result.stderr}")
@@ -495,7 +495,7 @@ def generate_token():
     return secrets.token_hex(32)
 
 
-def create_moltbot_config(token: str = None, api_key: str = None, provider: str = "emergent", force_new_token: bool = False):
+def create_openmind_config(token: str = None, api_key: str = None, provider: str = "emergent", force_new_token: bool = False):
     """Update openmind.json with gateway config and provider settings
 
     Args:
@@ -535,7 +535,7 @@ def create_moltbot_config(token: str = None, api_key: str = None, provider: str 
     # Gateway config to merge
     gateway_config = {
         "mode": "local",
-        "port": MOLTBOT_PORT,
+        "port": OPENMIND_PORT,
         "bind": "lan",
         "auth": {
             "mode": "token",
@@ -720,12 +720,12 @@ def create_moltbot_config(token: str = None, api_key: str = None, provider: str 
     with open(CONFIG_FILE, "w") as f:
         json.dump(existing_config, f, indent=2)
 
-    logger.info(f"Updated Moltbot config at {CONFIG_FILE} for provider: {provider}")
+    logger.info(f"Updated OpenMind config at {CONFIG_FILE} for provider: {provider}")
     return final_token  # Return the token being used
 
 
 async def start_gateway_process(api_key: str, provider: str, owner_user_id: str):
-    """Start the Moltbot gateway process via supervisor (persistent, survives backend restarts)"""
+    """Start the OpenMind gateway process via supervisor (persistent, survives backend restarts)"""
     global gateway_state
 
     # Check if already running via supervisor
@@ -743,7 +743,7 @@ async def start_gateway_process(api_key: str, provider: str, owner_user_id: str)
 
         if not token:
             token = generate_token()
-            create_moltbot_config(token=token, api_key=api_key, provider=provider, force_new_token=True)
+            create_openmind_config(token=token, api_key=api_key, provider=provider, force_new_token=True)
 
         gateway_state["token"] = token
         gateway_state["provider"] = provider
@@ -751,7 +751,7 @@ async def start_gateway_process(api_key: str, provider: str, owner_user_id: str)
         gateway_state["owner_user_id"] = owner_user_id
 
         # Update database
-        await db.moltbot_configs.update_one(
+        await db.openmind_configs.update_one(
             {"_id": "gateway_config"},
             {
                 "$set": {
@@ -771,19 +771,19 @@ async def start_gateway_process(api_key: str, provider: str, owner_user_id: str)
     # Ensure openmind is installed
     openmind_cmd = get_openmind_command()
     if not openmind_cmd:
-        if not ensure_moltbot_installed():
+        if not ensure_openmind_installed():
             raise HTTPException(status_code=500, detail="OpenMind (openmind) is not installed. Please contact support.")
         openmind_cmd = get_openmind_command()
         if not openmind_cmd:
             raise HTTPException(status_code=500, detail="Failed to find openmind after installation")
 
     # Create config (reuses existing token to avoid gateway restarts)
-    token = create_moltbot_config(api_key=api_key, provider=provider)
+    token = create_openmind_config(api_key=api_key, provider=provider)
 
     # Write environment file for supervisor wrapper to load
     write_gateway_env(token=token, api_key=api_key, provider=provider)
 
-    logger.info(f"Starting Moltbot gateway via supervisor on port {MOLTBOT_PORT}...")
+    logger.info(f"Starting OpenMind gateway via supervisor on port {OPENMIND_PORT}...")
 
     # Start via supervisor (will auto-restart on crash, survives backend restarts)
     if not SupervisorClient.start():
@@ -802,12 +802,12 @@ async def start_gateway_process(api_key: str, provider: str, owner_user_id: str)
     async with httpx.AsyncClient() as http_client:
         while asyncio.get_event_loop().time() - start_time < max_wait:
             try:
-                response = await http_client.get(f"http://127.0.0.1:{MOLTBOT_PORT}/", timeout=2.0)
+                response = await http_client.get(f"http://127.0.0.1:{OPENMIND_PORT}/", timeout=2.0)
                 if response.status_code == 200:
-                    logger.info("Moltbot gateway is ready!")
+                    logger.info("OpenMind gateway is ready!")
 
                     # Store config in database for persistence (with should_run flag)
-                    await db.moltbot_configs.update_one(
+                    await db.openmind_configs.update_one(
                         {"_id": "gateway_config"},
                         {
                             "$set": {
@@ -839,7 +839,7 @@ def check_gateway_running():
     return SupervisorClient.status()
 
 
-# ============== Moltbot API Endpoints (Protected) ==============
+# ============== OpenMind API Endpoints (Protected) ==============
 
 @api_router.get("/")
 async def root():
@@ -847,8 +847,8 @@ async def root():
 
 
 @api_router.post("/openmind/start", response_model=OpenMindStartResponse)
-async def start_moltbot(request: OpenMindStartRequest, req: Request):
-    """Start the Moltbot gateway with Emergent provider (requires auth)"""
+async def start_openmind(request: OpenMindStartRequest, req: Request):
+    """Start the OpenMind gateway with Emergent provider (requires auth)"""
     user = await require_auth(req)
 
     if request.provider not in ["emergent", "anthropic", "openai"]:
@@ -858,7 +858,7 @@ async def start_moltbot(request: OpenMindStartRequest, req: Request):
     if request.provider in ["anthropic", "openai"] and (not request.apiKey or len(request.apiKey) < 10):
         raise HTTPException(status_code=400, detail="API key required for anthropic/openai providers")
 
-    # Check if Moltbot is already running by another user
+    # Check if OpenMind is already running by another user
     if check_gateway_running() and gateway_state["owner_user_id"] != user.user_id:
         raise HTTPException(
             status_code=403,
@@ -881,13 +881,13 @@ async def start_moltbot(request: OpenMindStartRequest, req: Request):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to start Moltbot: {e}")
+        logger.error(f"Failed to start OpenMind: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @api_router.get("/openmind/status", response_model=OpenMindStatusResponse)
-async def get_moltbot_status(request: Request):
-    """Get the current status of the Moltbot gateway"""
+async def get_openmind_status(request: Request):
+    """Get the current status of the OpenMind gateway"""
     user = await get_current_user(request)
     running = check_gateway_running()
 
@@ -913,15 +913,15 @@ async def get_whatsapp_connection_status():
 
 
 @api_router.post("/openmind/stop")
-async def stop_moltbot(request: Request):
-    """Stop the Moltbot gateway (only owner can stop)"""
+async def stop_openmind(request: Request):
+    """Stop the OpenMind gateway (only owner can stop)"""
     user = await require_auth(request)
 
     global gateway_state
 
     if not check_gateway_running():
         # Clear should_run flag even if not running
-        await db.moltbot_configs.update_one(
+        await db.openmind_configs.update_one(
             {"_id": "gateway_config"},
             {"$set": {"should_run": False, "updated_at": datetime.now(timezone.utc)}}
         )
@@ -939,7 +939,7 @@ async def stop_moltbot(request: Request):
     clear_gateway_env()
 
     # Clear should_run flag in database
-    await db.moltbot_configs.update_one(
+    await db.openmind_configs.update_one(
         {"_id": "gateway_config"},
         {"$set": {"should_run": False, "updated_at": datetime.now(timezone.utc)}}
     )
@@ -954,7 +954,7 @@ async def stop_moltbot(request: Request):
 
 
 @api_router.get("/openmind/token")
-async def get_moltbot_token(request: Request):
+async def get_openmind_token(request: Request):
     """Get the current gateway token for authentication (only owner)"""
     user = await require_auth(request)
 
@@ -968,11 +968,11 @@ async def get_moltbot_token(request: Request):
     return {"token": gateway_state.get("token")}
 
 
-# ============== Moltbot Proxy (Protected) ==============
+# ============== OpenMind Proxy (Protected) ==============
 
 @api_router.api_route("/openmind/ui/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
-async def proxy_moltbot_ui(request: Request, path: str = ""):
-    """Proxy requests to the Moltbot Control UI (only owner can access)"""
+async def proxy_openmind_ui(request: Request, path: str = ""):
+    """Proxy requests to the OpenMind Control UI (only owner can access)"""
     user = await get_current_user(request)
 
     if not check_gateway_running():
@@ -988,7 +988,7 @@ async def proxy_moltbot_ui(request: Request, path: str = ""):
             status_code=403
         )
 
-    target_url = f"http://127.0.0.1:{MOLTBOT_PORT}/{path}"
+    target_url = f"http://127.0.0.1:{OPENMIND_PORT}/{path}"
 
     # Handle query string
     if request.query_params:
@@ -1032,13 +1032,13 @@ async def proxy_moltbot_ui(request: Request, path: str = ""):
                 ws_override = f'''
 <script>
 // OpenMind Proxy Configuration
-window.__MOLTBOT_PROXY_TOKEN__ = "{current_token}";
-window.__MOLTBOT_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/openmind/ws';
+window.__OPENMIND_PROXY_TOKEN__ = "{current_token}";
+window.__OPENMIND_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/openmind/ws';
 
 // Override WebSocket to use proxy path
 (function() {{
     const originalWS = window.WebSocket;
-    const proxyWsUrl = window.__MOLTBOT_PROXY_WS_URL__;
+    const proxyWsUrl = window.__OPENMIND_PROXY_WS_URL__;
 
     window.WebSocket = function(url, protocols) {{
         let finalUrl = url;
@@ -1092,20 +1092,20 @@ window.__MOLTBOT_PROXY_WS_URL__ = (window.location.protocol === 'https:' ? 'wss:
             raise HTTPException(status_code=502, detail="Failed to connect to OpenMind")
 
 
-# Root proxy for Moltbot UI (handles /api/moltbot/ui without trailing path)
+# Root proxy for OpenMind UI (handles /api/openmind/ui without trailing path)
 @api_router.get("/openmind/ui")
-async def proxy_moltbot_ui_root(request: Request):
-    """Redirect to Moltbot UI with trailing slash"""
+async def proxy_openmind_ui_root(request: Request):
+    """Redirect to OpenMind UI with trailing slash"""
     return Response(
         status_code=307,
         headers={"Location": "/api/openmind/ui/"}
     )
 
 
-# WebSocket proxy for Moltbot (Protected)
+# WebSocket proxy for OpenMind (Protected)
 @api_router.websocket("/openmind/ws")
 async def websocket_proxy(websocket: WebSocket):
-    """WebSocket proxy for Moltbot Control UI"""
+    """WebSocket proxy for OpenMind Control UI"""
     await websocket.accept()
 
     if not check_gateway_running():
@@ -1118,10 +1118,10 @@ async def websocket_proxy(websocket: WebSocket):
     # Get the token from state
     token = gateway_state.get("token")
 
-    # Moltbot expects WebSocket connection with optional auth in query params
-    moltbot_ws_url = f"ws://127.0.0.1:{MOLTBOT_PORT}/"
+    # OpenMind expects WebSocket connection with optional auth in query params
+    openmind_ws_url = f"ws://127.0.0.1:{OPENMIND_PORT}/"
 
-    logger.info(f"WebSocket proxy connecting to: {moltbot_ws_url}")
+    logger.info(f"WebSocket proxy connecting to: {openmind_ws_url}")
 
     try:
         # Additional headers for connection
@@ -1130,48 +1130,48 @@ async def websocket_proxy(websocket: WebSocket):
             extra_headers["X-Auth-Token"] = token
 
         async with websockets.connect(
-            moltbot_ws_url,
+            openmind_ws_url,
             ping_interval=20,
             ping_timeout=20,
             close_timeout=10,
             additional_headers=extra_headers if extra_headers else None
-        ) as moltbot_ws:
+        ) as openmind_ws:
 
-            async def client_to_moltbot():
+            async def client_to_openmind():
                 try:
                     while True:
                         try:
                             data = await websocket.receive()
                             if data["type"] == "websocket.receive":
                                 if "text" in data:
-                                    await moltbot_ws.send(data["text"])
+                                    await openmind_ws.send(data["text"])
                                 elif "bytes" in data:
-                                    await moltbot_ws.send(data["bytes"])
+                                    await openmind_ws.send(data["bytes"])
                             elif data["type"] == "websocket.disconnect":
                                 break
                         except WebSocketDisconnect:
                             break
                 except Exception as e:
-                    logger.error(f"Client to Moltbot error: {e}")
+                    logger.error(f"Client to OpenMind error: {e}")
 
-            async def moltbot_to_client():
+            async def openmind_to_client():
                 try:
-                    async for message in moltbot_ws:
+                    async for message in openmind_ws:
                         if websocket.client_state == WebSocketState.CONNECTED:
                             if isinstance(message, str):
                                 await websocket.send_text(message)
                             else:
                                 await websocket.send_bytes(message)
                 except ConnectionClosed as e:
-                    logger.info(f"Moltbot WebSocket closed: {e}")
+                    logger.info(f"OpenMind WebSocket closed: {e}")
                 except Exception as e:
-                    logger.error(f"Moltbot to client error: {e}")
+                    logger.error(f"OpenMind to client error: {e}")
 
             # Run both directions concurrently
             done, pending = await asyncio.wait(
                 [
-                    asyncio.create_task(client_to_moltbot()),
-                    asyncio.create_task(moltbot_to_client())
+                    asyncio.create_task(client_to_openmind()),
+                    asyncio.create_task(openmind_to_client())
                 ],
                 return_when=asyncio.FIRST_COMPLETED
             )
@@ -1767,7 +1767,7 @@ async def whatsapp_auto_fix_watcher():
 
 @app.on_event("startup")
 async def startup_event():
-    """Run on server startup - ensure Moltbot dependencies are installed and auto-start gateway if needed"""
+    """Run on server startup - ensure OpenMind dependencies are installed and auto-start gateway if needed"""
     global whatsapp_watcher_task, gateway_state
 
     logger.info("Server starting up...")
@@ -1775,17 +1775,17 @@ async def startup_event():
     # Reload supervisor config to pick up any changes
     SupervisorClient.reload_config()
 
-    # Check and install Moltbot dependencies if needed
+    # Check and install OpenMind dependencies if needed
     openmind_cmd = get_openmind_command()
     if openmind_cmd:
-        logger.info(f"Moltbot dependencies ready: {openmind_cmd}")
+        logger.info(f"OpenMind dependencies ready: {openmind_cmd}")
     else:
-        logger.info("Moltbot dependencies not found, will install on first use")
+        logger.info("OpenMind dependencies not found, will install on first use")
 
     # Check database for persistent gateway config
     config_doc = None
     try:
-        config_doc = await db.moltbot_configs.find_one({"_id": "gateway_config"})
+        config_doc = await db.openmind_configs.find_one({"_id": "gateway_config"})
     except Exception as e:
         logger.warning(f"Could not read gateway config from database: {e}")
 
