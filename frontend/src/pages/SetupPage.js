@@ -57,6 +57,12 @@ export default function SetupPage() {
       }
     };
     checkAuth();
+    
+    // Check if onboarding is needed
+    const onboardingComplete = localStorage.getItem('moltbot_onboarding_complete');
+    if (!onboardingComplete) {
+      setShowOnboarding(true);
+    }
   }, [navigate, location.state]);
 
   const checkOpenClawStatus = async () => {
