@@ -9,7 +9,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2, ExternalLink, CheckCircle2, LogOut, AlertCircle, User, Brain, Package, Clock, Settings } from 'lucide-react';
-import OpenClaw from '@/components/ui/icons/OpenClaw';
+import OpenMind from '@/components/ui/icons/OpenMind';
 import OnboardingWizard from '@/components/OnboardingWizard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
@@ -250,7 +250,7 @@ export default function SetupPage() {
         >
           <div className="max-w-lg">
             <div className="flex items-center gap-3 mb-2">
-              <OpenClaw size={36} />
+              <OpenMind size={36} />
               <h1 className="heading text-2xl sm:text-3xl font-semibold tracking-tight">
                 OpenMind Setup
               </h1>

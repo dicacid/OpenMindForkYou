@@ -18,7 +18,7 @@ import {
   Zap,
   Brain
 } from 'lucide-react';
-import OpenClaw from '@/components/ui/icons/OpenClaw';
+import OpenMind from '@/components/ui/icons/OpenMind';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 const API = `${BACKEND_URL}/api`;
@@ -76,7 +76,7 @@ function WelcomeStep({ onNext }) {
           animate={{ scale: 1 }}
           transition={{ type: 'spring', duration: 0.8 }}
         >
-          <OpenClaw size={120} />
+          <OpenMind size={120} />
         </motion.div>
       </div>
       

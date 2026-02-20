@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Loader2, Lock } from 'lucide-react';
-import OpenClaw from '@/components/ui/icons/OpenClaw';
+import OpenMind from '@/components/ui/icons/OpenMind';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 const API = `${BACKEND_URL}/api`;
