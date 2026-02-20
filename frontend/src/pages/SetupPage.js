@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2, ExternalLink, CheckCircle2, LogOut, AlertCircle, User, Brain, Package, Clock } from 'lucide-react';
 import OpenClaw from '@/components/ui/icons/OpenClaw';
+import OnboardingWizard from '@/components/OnboardingWizard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 const API = `${BACKEND_URL}/api`;
