@@ -261,7 +261,17 @@ export default function SetupPage() {
           </div>
           
           {/* User info and logout */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/settings')}
+              data-testid="settings-button"
+              className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
+            >
+              <Settings className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Settings</span>
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -269,7 +279,7 @@ export default function SetupPage() {
               data-testid="scheduler-button"
               className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
             >
-              <Clock className="w-4 h-4 mr-2" />
+              <Clock className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Scheduler</span>
             </Button>
             <Button
@@ -279,7 +289,7 @@ export default function SetupPage() {
               data-testid="skills-button"
               className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
             >
-              <Package className="w-4 h-4 mr-2" />
+              <Package className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Skills</span>
             </Button>
             <Button
@@ -289,11 +299,11 @@ export default function SetupPage() {
               data-testid="memory-manager-button"
               className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
             >
-              <Brain className="w-4 h-4 mr-2" />
+              <Brain className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Memory</span>
             </Button>
             {user && (
-              <div className="flex items-center gap-2 text-sm text-zinc-400">
+              <div className="hidden sm:flex items-center gap-2 text-sm text-zinc-400">
                 {user.picture ? (
                   <img 
                     src={user.picture} 
@@ -303,7 +313,7 @@ export default function SetupPage() {
                 ) : (
                   <User className="w-5 h-5" />
                 )}
-                <span className="hidden sm:inline">{user.name}</span>
+                <span className="hidden md:inline">{user.name}</span>
               </div>
             )}
             <Button
@@ -314,7 +324,7 @@ export default function SetupPage() {
               className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
             >
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">Logout</span>
+              <span className="hidden sm:inline sm:ml-2">Logout</span>
             </Button>
           </div>
         </motion.div>
