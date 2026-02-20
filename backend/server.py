@@ -1888,7 +1888,7 @@ async def whatsapp_auto_fix_watcher():
                 logger.info("[whatsapp-watcher] DETECTED registered=false, applying fix...")
                 if fix_registered_flag():
                     logger.info("[whatsapp-watcher] Fix applied, restarting gateway via supervisor...")
-                    result = subprocess.run(["supervisorctl", "restart", "openmind-gateway"], capture_output=True, text=True)
+                    result = subprocess.run(["supervisorctl", "restart", "clawdbot-gateway"], capture_output=True, text=True)
                     logger.info(f"[whatsapp-watcher] Supervisor restart result: {result.stdout} {result.stderr}")
         except Exception as e:
             logger.warning(f"[whatsapp-watcher] Error: {e}")
