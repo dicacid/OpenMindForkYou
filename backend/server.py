@@ -37,6 +37,8 @@ from memory_manager import (
     MEMORY_FILE,
     SOUL_FILE
 )
+# Skills management
+from skills_manager import create_skill_document, update_skill_config
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
