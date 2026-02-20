@@ -65,8 +65,8 @@ api_router = APIRouter(prefix="/api")
 # OpenMind Gateway Management
 OPENMIND_PORT = 18789
 OPENMIND_CONTROL_PORT = 18791
-CONFIG_DIR = os.path.expanduser("~/.openmind")
-CONFIG_FILE = os.path.join(CONFIG_DIR, "openmind.json")
+CONFIG_DIR = os.path.expanduser("~/.clawdbot")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "clawdbot.json")
 WORKSPACE_DIR = os.path.expanduser("~/openmind-workspace")
 
 # Global state for gateway (per-user)
@@ -435,8 +435,8 @@ async def logout(request: Request, response: Response):
 
 # Persistent paths for Node.js and openmind
 NODE_DIR = "/root/nodejs"
-OPENMIND_DIR = "/root/.openmind-bin"
-OPENMIND_WRAPPER = "/root/run_openmind.sh"
+OPENMIND_DIR = "/root/.clawdbot-bin"
+OPENMIND_WRAPPER = "/root/run_clawdbot.sh"
 
 def get_openmind_command():
     """Get the path to openmind executable"""
@@ -444,15 +444,16 @@ def get_openmind_command():
     if os.path.exists(OPENMIND_WRAPPER):
         return OPENMIND_WRAPPER
     # Try persistent location
-    if os.path.exists(f"{OPENMIND_DIR}/openmind"):
-        return f"{OPENMIND_DIR}/openmind"
-    if os.path.exists(f"{NODE_DIR}/bin/openmind"):
-        return f"{NODE_DIR}/bin/openmind"
+    if os.path.exists(f"{OPENMIND_DIR}/clawdbot"):
+        return f"{OPENMIND_DIR}/clawdbot"
+    if os.path.exists(f"{NODE_DIR}/bin/clawdbot"):
+        return f"{NODE_DIR}/bin/clawdbot"
     # Try system path
     import shutil
-    openmind_path = shutil.which("openmind")
-    if openmind_path:
-        return openmind_path
+    for cmd in ["openmind", "clawdbot"]:
+        cmd_path = shutil.which(cmd)
+        if cmd_path:
+            return cmd_path
     return None
 
 
@@ -564,11 +565,17 @@ def create_openmind_config(token: str = None, api_key: str = None, provider: str
         existing_config["agents"]["defaults"] = {}
     existing_config["agents"]["defaults"]["workspace"] = WORKSPACE_DIR
 
+    def require_env(var_name: str) -> str:
+        value = os.environ.get(var_name)
+        if not value:
+            raise HTTPException(status_code=500, detail=f"Missing {var_name} in environment")
+        return value
+
     # Configure providers based on selection
     if provider == "emergent":
         # Use Emergent's proxy for both GPT and Claude
-        emergent_key = api_key or os.environ.get('EMERGENT_API_KEY', 'sk-emergent-1234')
-        emergent_base_url = os.environ.get('EMERGENT_BASE_URL', 'https://integrations.emergentagent.com/llm')
+        emergent_key = api_key or require_env('EMERGENT_API_KEY')
+        emergent_base_url = require_env('EMERGENT_BASE_URL')
 
         # Emergent GPT provider (openai-completions API)
         emergent_gpt_provider = {
@@ -633,8 +640,9 @@ def create_openmind_config(token: str = None, api_key: str = None, provider: str
 
     elif provider == "openai":
         # Direct OpenAI API with user's own key
+        openai_base_url = require_env('OPENAI_BASE_URL')
         openai_provider = {
-            "baseUrl": "https://api.openai.com/v1/",
+            "baseUrl": openai_base_url,
             "apiKey": api_key,
             "api": "openai-completions",
             "models": [
@@ -691,8 +699,9 @@ def create_openmind_config(token: str = None, api_key: str = None, provider: str
 
     elif provider == "anthropic":
         # Direct Anthropic API with user's own key
+        anthropic_base_url = require_env('ANTHROPIC_BASE_URL')
         anthropic_provider = {
-            "baseUrl": "https://api.anthropic.com",
+            "baseUrl": anthropic_base_url,
             "apiKey": api_key,
             "api": "anthropic-messages",
             "models": [
@@ -715,6 +724,74 @@ def create_openmind_config(token: str = None, api_key: str = None, provider: str
         }
         existing_config["agents"]["defaults"]["model"] = {
             "primary": "anthropic/claude-opus-4-5-20251101"
+        }
+
+    elif provider == "openrouter":
+        openrouter_base_url = require_env('OPENROUTER_BASE_URL')
+        openrouter_provider = {
+            "baseUrl": openrouter_base_url,
+            "apiKey": api_key,
+            "api": "openai-completions",
+            "models": [
+                {
+                    "id": "meta-llama/llama-3.3-70b-instruct",
+                    "name": "Llama 3.3 70B Instruct",
+                    "reasoning": True,
+                    "input": ["text"],
+                    "contextWindow": 8192,
+                    "maxTokens": 4096
+                },
+                {
+                    "id": "openai/gpt-4o",
+                    "name": "GPT-4o (OpenRouter)",
+                    "reasoning": False,
+                    "input": ["text", "image"],
+                    "contextWindow": 128000,
+                    "maxTokens": 16384
+                }
+            ]
+        }
+
+        existing_config["models"]["providers"]["openrouter"] = openrouter_provider
+        existing_config["agents"]["defaults"]["models"] = {
+            "openrouter/meta-llama/llama-3.3-70b-instruct": {"alias": "llama-3.3"}
+        }
+        existing_config["agents"]["defaults"]["model"] = {
+            "primary": "openrouter/meta-llama/llama-3.3-70b-instruct"
+        }
+
+    elif provider == "gemini":
+        gemini_base_url = require_env('GEMINI_BASE_URL')
+        gemini_provider = {
+            "baseUrl": gemini_base_url,
+            "apiKey": api_key,
+            "api": "google-generative-ai",
+            "models": [
+                {
+                    "id": "gemini-2.5-pro",
+                    "name": "Gemini 2.5 Pro",
+                    "reasoning": True,
+                    "input": ["text", "image"],
+                    "contextWindow": 128000,
+                    "maxTokens": 8192
+                },
+                {
+                    "id": "gemini-2.5-flash",
+                    "name": "Gemini 2.5 Flash",
+                    "reasoning": False,
+                    "input": ["text", "image"],
+                    "contextWindow": 100000,
+                    "maxTokens": 8192
+                }
+            ]
+        }
+
+        existing_config["models"]["providers"]["gemini"] = gemini_provider
+        existing_config["agents"]["defaults"]["models"] = {
+            "gemini/gemini-2.5-pro": {"alias": "gemini-pro"}
+        }
+        existing_config["agents"]["defaults"]["model"] = {
+            "primary": "gemini/gemini-2.5-pro"
         }
 
     with open(CONFIG_FILE, "w") as f:
