@@ -22,6 +22,7 @@ function AppRouter() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<SetupPage />} />
+      <Route path="/memory" element={<MemoryManagerPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
