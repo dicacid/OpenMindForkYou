@@ -246,6 +246,16 @@ export default function SetupPage() {
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => navigate('/scheduler')}
+              data-testid="scheduler-button"
+              className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Scheduler</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate('/skills')}
               data-testid="skills-button"
               className="text-zinc-400 hover:text-zinc-200 hover:bg-[#1f2022]"
