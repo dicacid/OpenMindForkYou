@@ -30,6 +30,7 @@ export default function SetupPage() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState(null);
   const [checkingStatus, setCheckingStatus] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Check auth on mount (if not passed from AuthCallback)
   useEffect(() => {
