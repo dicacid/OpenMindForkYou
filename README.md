@@ -1,9 +1,3 @@
-
-Alright. If a repository is called OpenMindForkYou, it deserves instructions that feel less like IKEA and more like a secret society handbook. Here’s a clean, usable set you can drop straight into a README.
-
-
----
-
 OpenMindForkYou
 
 Here Are Your Instructions
