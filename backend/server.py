@@ -47,6 +47,16 @@ from scheduler_manager import (
     create_job_document,
     create_execution_log
 )
+# Email authentication
+from email_service import get_email_service
+from code_generator import (
+    generate_verification_code,
+    request_code_rate_limit,
+    verify_code_rate_limit,
+    record_verification_attempt,
+    resend_code_rate_limit,
+    get_pending_code
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -56,8 +66,33 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+
+# Initialize database indexes (async startup)
+async def init_db_indexes():
+    """Initialize database indexes for email verification codes."""
+    try:
+        # Create TTL index on expires_at (auto-delete after expiry)
+        await db.email_verification_codes.create_index(
+            "expires_at",
+            expireAfterSeconds=0
+        )
+        # Create compound index for efficient queries
+        await db.email_verification_codes.create_index(
+            [("email", 1), ("verified", 1)]
+        )
+        logger.info("Database indexes initialized")
+    except Exception as e:
+        logger.error(f"Failed to initialize database indexes: {e}")
+
+
 # Create the main app without a prefix
 app = FastAPI()
+
+
+# Run database initialization on startup
+@app.on_event("startup")
+async def startup():
+    await init_db_indexes()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -132,6 +167,30 @@ class User(BaseModel):
 
 class SessionRequest(BaseModel):
     session_id: str
+
+
+# ============== Email Auth Models ==============
+
+class EmailCodeRequestRequest(BaseModel):
+    email: str
+
+
+class EmailCodeRequestResponse(BaseModel):
+    ok: bool
+    message: str
+    expires_in_seconds: int
+    email_masked: Optional[str] = None
+
+
+class EmailCodeVerifyRequest(BaseModel):
+    email: str
+    code: str
+
+
+class EmailCodeVerifyResponse(BaseModel):
+    ok: bool
+    user: Optional[dict] = None
+    session: Optional[dict] = None
 
 
 class MemorySaveRequest(BaseModel):
@@ -429,6 +488,283 @@ async def logout(request: Request, response: Response):
     )
 
     return {"ok": True, "message": "Logged out"}
+
+
+# ============== Email Authentication Endpoints ==============
+
+@api_router.post("/auth/email/request-code")
+async def request_verification_code(
+    request_data: EmailCodeRequestRequest,
+    response: Response
+):
+    """
+    Request a verification code for email login.
+    Generates a 6-digit code and sends via email.
+    """
+    try:
+        email = request_data.email.lower().strip()
+
+        # Validate email format
+        from email_validator import validate_email, EmailNotValidError
+        try:
+            validate_email(email)
+        except EmailNotValidError:
+            raise HTTPException(status_code=400, detail="Invalid email format")
+
+        # Check rate limit for code requests
+        allowed, retry_after = await request_code_rate_limit(
+            db, email, max_requests=3, window_minutes=15
+        )
+        if not allowed:
+            response.status_code = 429
+            return {
+                "ok": False,
+                "error": f"Too many code requests. Try again in {retry_after} seconds",
+                "retry_after": retry_after
+            }
+
+        # Generate code
+        code = generate_verification_code()
+        now = datetime.now(timezone.utc)
+        expires_at = now + timedelta(minutes=10)
+
+        # Store code in database
+        await db.email_verification_codes.insert_one({
+            "email": email,
+            "code": code,
+            "expires_at": expires_at,
+            "created_at": now,
+            "attempt_count": 0,
+            "verified": False
+        })
+
+        # Send email
+        email_service = get_email_service()
+        sent = await email_service.send_verification_code(
+            email=email,
+            code=code,
+            expires_in_minutes=10
+        )
+
+        if not sent:
+            logger.warning(f"Failed to send code to {email}, but code was created")
+            # Still return success but maybe log this
+
+        # Mask email for UI display
+        email_parts = email.split("@")
+        email_masked = email_parts[0][0] + "***@" + email_parts[1]
+
+        return {
+            "ok": True,
+            "message": f"Verification code sent to {email}",
+            "expires_in_seconds": 600,
+            "email_masked": email_masked
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error requesting verification code: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send code")
+
+
+@api_router.post("/auth/email/verify-code")
+async def verify_verification_code(
+    request_data: EmailCodeVerifyRequest,
+    response: Response
+):
+    """
+    Verify a 6-digit code and create a session.
+    Returns session token and user info on success.
+    """
+    try:
+        email = request_data.email.lower().strip()
+        code = request_data.code.strip()
+
+        # Validate inputs
+        if not code or len(code) != 6 or not code.isdigit():
+            raise HTTPException(status_code=400, detail="Invalid code format")
+
+        # Get the pending code for this email
+        code_doc = await get_pending_code(db, email)
+
+        if not code_doc:
+            raise HTTPException(status_code=400, detail={
+                "error": "Code not found or expired. Request a new code.",
+                "code": "EXPIRED"
+            })
+
+        # Check rate limit on verification attempts
+        allowed, attempts_remaining = await verify_code_rate_limit(
+            db, code_doc["_id"], max_attempts=5
+        )
+
+        if not allowed:
+            raise HTTPException(status_code=401, detail={
+                "error": "Too many failed attempts. Request a new code.",
+                "code": "LOCKED"
+            })
+
+        # Verify code
+        if code_doc["code"] != code:
+            # Record failed attempt
+            await record_verification_attempt(db, code_doc["_id"], success=False)
+            raise HTTPException(status_code=401, detail={
+                "error": "Invalid code",
+                "attempts_remaining": attempts_remaining
+            })
+
+        # Code is valid! Check instance lock before creating session
+        owner = await get_instance_owner()
+        if owner and owner.get("email") != email:
+            logger.warning(f"Blocked login attempt from {email} - instance locked to {owner.get('email')}")
+            raise HTTPException(status_code=403, detail={
+                "error": f"This instance is locked to {owner.get('email')}. Access denied.",
+                "code": "INSTANCE_LOCKED"
+            })
+
+        # Mark code as verified to prevent reuse
+        await db.email_verification_codes.update_one(
+            {"_id": code_doc["_id"]},
+            {"$set": {"verified": True}}
+        )
+
+        # Check if user exists
+        existing_user = await db.users.find_one({"email": email}, {"_id": 0})
+
+        if existing_user:
+            user_id = existing_user["user_id"]
+        else:
+            # Create new user
+            user_id = f"user_{uuid.uuid4().hex[:12]}"
+            await db.users.insert_one({
+                "user_id": user_id,
+                "email": email,
+                "name": email.split("@")[0],
+                "picture": None,
+                "created_at": datetime.now(timezone.utc),
+                "email_verified_at": datetime.now(timezone.utc)
+            })
+
+        # Lock instance to first user (if not already locked)
+        await set_instance_owner(User(
+            user_id=user_id,
+            email=email,
+            name=email.split("@")[0],
+            picture=None
+        ))
+
+        # Create session
+        session_token = secrets.token_hex(32)
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+
+        await db.user_sessions.insert_one({
+            "user_id": user_id,
+            "session_token": session_token,
+            "expires_at": expires_at,
+            "created_at": datetime.now(timezone.utc)
+        })
+
+        # Set session cookie
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=7 * 24 * 60 * 60
+        )
+
+        # Get user data
+        user_doc = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+
+        return {
+            "ok": True,
+            "user": user_doc,
+            "session": {
+                "token": session_token,
+                "expires_in_seconds": 604800  # 7 days
+            }
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error verifying code: {e}")
+        raise HTTPException(status_code=500, detail="Verification failed")
+
+
+@api_router.post("/auth/email/resend-code")
+async def resend_verification_code(
+    request_data: EmailCodeRequestRequest,
+    response: Response
+):
+    """
+    Resend a verification code to an email.
+    More rate-limited than initial request.
+    """
+    try:
+        email = request_data.email.lower().strip()
+
+        # Validate email format
+        from email_validator import validate_email, EmailNotValidError
+        try:
+            validate_email(email)
+        except EmailNotValidError:
+            raise HTTPException(status_code=400, detail="Invalid email format")
+
+        # Check resend rate limit
+        allowed, retry_after = await resend_code_rate_limit(
+            db, email, max_resends=2, window_minutes=5
+        )
+        if not allowed:
+            response.status_code = 429
+            return {
+                "ok": False,
+                "error": f"Too many resend requests. Try again in {retry_after} seconds",
+                "retry_after": retry_after
+            }
+
+        # Generate new code
+        code = generate_verification_code()
+        now = datetime.now(timezone.utc)
+        expires_at = now + timedelta(minutes=10)
+
+        # Store new code in database
+        await db.email_verification_codes.insert_one({
+            "email": email,
+            "code": code,
+            "expires_at": expires_at,
+            "created_at": now,
+            "attempt_count": 0,
+            "verified": False
+        })
+
+        # Send email
+        email_service = get_email_service()
+        await email_service.send_verification_code(
+            email=email,
+            code=code,
+            expires_in_minutes=10
+        )
+
+        # Mask email for UI display
+        email_parts = email.split("@")
+        email_masked = email_parts[0][0] + "***@" + email_parts[1]
+
+        return {
+            "ok": True,
+            "message": f"New verification code sent to {email}",
+            "expires_in_seconds": 600,
+            "email_masked": email_masked
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error resending verification code: {e}")
+        raise HTTPException(status_code=500, detail="Failed to resend code")
 
 
 # ============== OpenMind Helpers ==============
