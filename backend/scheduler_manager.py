@@ -1,8 +1,34 @@
 """Heartbeat Scheduler - manages scheduled jobs and executions"""
+import signal
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from croniter import croniter
 import re
+import logging
+
+logger = logging.getLogger(__name__)
+
+CRON_PRESETS: Dict[str, str] = {
+    "0 * * * *": "Every hour",
+    "0 8 * * *": "Every day at 8:00 AM",
+    "0 20 * * *": "Every day at 8:00 PM",
+    "0 8 * * 1": "Every Monday at 8:00 AM",
+    "*/15 * * * *": "Every 15 minutes",
+    "0 0 * * *": "Every day at midnight",
+    "0 12 * * *": "Every day at noon"
+}
+
+@contextmanager
+def timeout(seconds: int):
+    def signal_handler(signum, frame):
+        raise TimeoutError("Cron validation timeout")
+    signal.signal(signal.SIGALRM, signal_handler)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
 
 def parse_cron_to_human(cron_expression: str) -> str:
     """Convert cron expression to human-readable format"""
@@ -14,20 +40,8 @@ def parse_cron_to_human(cron_expression: str) -> str:
         minute, hour, day, month, weekday = parts
         
         # Common patterns
-        if cron_expression == "0 * * * *":
-            return "Every hour"
-        if cron_expression == "0 8 * * *":
-            return "Every day at 8:00 AM"
-        if cron_expression == "0 20 * * *":
-            return "Every day at 8:00 PM"
-        if cron_expression == "0 8 * * 1":
-            return "Every Monday at 8:00 AM"
-        if cron_expression == "*/15 * * * *":
-            return "Every 15 minutes"
-        if cron_expression == "0 0 * * *":
-            return "Every day at midnight"
-        if cron_expression == "0 12 * * *":
-            return "Every day at noon"
+        if cron_expression in CRON_PRESETS:
+            return CRON_PRESETS[cron_expression]
         
         # Build description
         parts_desc = []
@@ -71,6 +85,7 @@ def parse_cron_to_human(cron_expression: str) -> str:
         
         return " ".join(parts_desc).capitalize() if parts_desc else "Custom schedule"
     except Exception as e:
+        logger.warning(f"Error parsing cron to human: {str(e)}")
         return f"Invalid cron: {str(e)}"
 
 def get_next_run_time(cron_expression: str) -> Optional[str]:
@@ -80,18 +95,26 @@ def get_next_run_time(cron_expression: str) -> Optional[str]:
         cron = croniter(cron_expression, base_time)
         next_run = cron.get_next(datetime)
         return next_run.isoformat()
-    except Exception:
+    except (ValueError, KeyError) as e:
+        logger.warning(f"Failed to get next run time for '{cron_expression}': {e}")
         return None
 
-def validate_cron(cron_expression: str) -> bool:
+def validate_cron(cron_expression: str, timeout_seconds: int = 2) -> bool:
     """Validate a cron expression"""
     try:
-        croniter(cron_expression)
+        with timeout(timeout_seconds):
+            croniter(cron_expression)
         return True
-    except Exception:
+    except TimeoutError:
+        logger.error("Cron validation timed out")
+        return False
+    except (ValueError, KeyError):
+        return False
+    except Exception as e:
+        logger.error(f"Unexpected error validating cron: {e}")
         return False
 
-def create_job_document(name: str, cron: str, prompt: str, channel: str, active: bool = True) -> dict:
+def create_job_document(name: str, cron: str, prompt: str, channel: str, active: bool = True) -> Dict[str, Any]:
     """Create a job document for MongoDB"""
     now = datetime.now(timezone.utc)
     return {
@@ -107,7 +130,7 @@ def create_job_document(name: str, cron: str, prompt: str, channel: str, active:
         "next_run_at": get_next_run_time(cron)
     }
 
-def create_execution_log(job_id: str, job_name: str, status: str, output: str) -> dict:
+def create_execution_log(job_id: str, job_name: str, status: str, output: str) -> Dict[str, Any]:
     """Create an execution log document"""
     return {
         "job_id": job_id,
